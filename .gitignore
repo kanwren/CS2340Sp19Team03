@@ -1,6 +1,3 @@
-# Ignore scalastyle output
-scalastyle-config.xml
-
 # Ignore Play! working directory #
 bin/
 /db

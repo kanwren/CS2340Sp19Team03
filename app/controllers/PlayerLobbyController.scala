@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject.Inject
-import models.Game
+import models.{Game, GameManager}
 import play.api.data._
 import play.api.mvc._
 

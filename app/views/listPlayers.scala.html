@@ -36,7 +36,7 @@
     @helper.form(action = routes.PlayerLobbyController.addPlayer(gameId)) {
       @helper.CSRF.formField
 
-      @helper.inputText(form("name"))
+      @helper.inputText(form("name"), '_label -> "Name:")
 
       @if(players.length < 6){
        <button>Add Player</button>

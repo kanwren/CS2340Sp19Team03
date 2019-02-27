@@ -1,41 +1,69 @@
+// Copyright (C) 2011-2012 the original author or authors.
+// See the LICENCE.txt file distributed with this work for additional
+// information regarding copyright ownership.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package controllers
 
-import javax.inject._
-import play.api._
-import play.api.i18n._
+import javax.inject.Inject
+import play.api.data._
 import play.api.mvc._
 
-import scala.collection.mutable.ArrayBuffer
-import scala.util.Random
-import PlayerInput._
+class GameController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
 
-import scala.collection.mutable
+  def index: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    Ok(views.html.index(JoinForm.form))
+  }
 
+  def createGame: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
+    val gameId = GameManager.makeNewGame
+    Redirect(routes.PlayerLobbyController.listPlayers(gameId))
+  }
 
-class GameController @Inject()(cc: ControllerComponents) extends AbstractController(cc)  {
+  def startGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    val game = GameManager.getGameById(gameId)
+    game match {
+      case None => Redirect(routes.GameController.index()).flashing("ERROR" -> s"Could not find game with game ID '$gameId'")
+      case Some(g) =>
+        g.startGame()
+        Redirect(routes.GameController.showGame(gameId))
+    }
+  }
 
+  def joinGame: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    val errorFunction = { formWithErrors: Form[JoinForm.GameId] =>
+      BadRequest(views.html.index(formWithErrors))
+    }
 
-	val names: ArrayBuffer[String] = Random.shuffle(players)
+    def successFunction(gameId: JoinForm.GameId): Result = {
+      GameManager.getGameById(gameId.id) match {
+        case None =>
+          Redirect(routes.GameController.index()).flashing("ERROR" -> s"Could not find game with game ID '${gameId.id}'")
+        case Some(_) =>
+          Redirect(routes.PlayerLobbyController.listPlayers(gameId.id))
+      }
+    }
+    val formValidationResult = JoinForm.form.bindFromRequest
+    formValidationResult.fold(errorFunction, successFunction)
+  }
 
-	val playerMap: mutable.HashMap[String, Int] = mutable.HashMap[String, Int]()
-
-	val initialAllotment: Int = 5 * (6 - names.length) + 20
-
-	for (i <- names) {
-		playerMap(i) = initialAllotment
-	}
-
-	def showGame: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-		val names = Random.shuffle(players)
-
-	    val playerMap = mutable.HashMap[String, Int]()
-
-	    val initialAllotment = 5 * (6 - names.length) + 20
-
-	    for (i <- names) {
-	    	playerMap(i) = initialAllotment
-	    }
-		Ok(views.html.game(playerMap, names))
-	}
+  def showGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    val game = GameManager.getGameById(gameId)
+    game match {
+      case None => Redirect(routes.GameController.index()).flashing("ERROR" -> s"Could not find game with game ID '$gameId'")
+      case Some(g) => Ok(views.html.game(g))
+    }
+  }
 
 }

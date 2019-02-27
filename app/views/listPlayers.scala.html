@@ -1,6 +1,8 @@
-@(players: Seq[String], form: Form[WidgetForm.Data], postUrl: Call)(implicit request: MessagesRequestHeader)
+@(players: Seq[String], gameId: String, form: Form[PlayerForm.PlayerData])(implicit request: MessagesRequestHeader)
 
   @main("Players") {
+
+    <p>Game ID: @gameId</p>
 
     <h1>Players</h1>
 
@@ -31,10 +33,10 @@
       }
     }
 
-    @helper.form(postUrl) {
+    @helper.form(action = routes.PlayerLobbyController.addPlayer(gameId)) {
       @helper.CSRF.formField
 
-      @helper.inputText(form("name"))
+      @helper.inputText(form("name"), '_label -> "Name:")
 
       @if(players.length < 6){
        <button>Add Player</button>
@@ -44,9 +46,8 @@
     }
 
     @if(players.length >= 3){
-       <button  onclick="location.href='@routes.GameController.showGame'" type="button">Setup Game!</button>
-
+       <button onclick="location.href='@routes.GameController.startGame(gameId)'" type="button">Start Game!</button>
     } else {
-       <button  onclick="location.href='@routes.GameController.showGame'" type="button" disabled>Setup Game!</button>
+       <button onclick="location.href='@routes.GameController.startGame(gameId)'" type="button" disabled>Start Game!</button>
     }
   }

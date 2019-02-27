@@ -3,19 +3,11 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.GameController.index
-POST    /                           controllers.GameController.joinGame
+GET     /                           controllers.WidgetController.index
 
-GET     /createGame                 controllers.GameController.createGame
-
-# Player Entry
-GET     /lobby/:gameId              controllers.PlayerLobbyController.listPlayers(gameId)
-POST    /lobby/:gameId              controllers.PlayerLobbyController.addPlayer(gameId)
-
-# Initialized
-GET     /startGame/:gameId          controllers.GameController.startGame(gameId)
-
-GET     /:gameId                    controllers.GameController.showGame(gameId)
+# Widgets
+GET     /widgets                    controllers.WidgetController.listWidgets
+POST    /widgets                    controllers.WidgetController.createWidget
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

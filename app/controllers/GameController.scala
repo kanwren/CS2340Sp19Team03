@@ -3,6 +3,7 @@ package controllers
 import javax.inject.Inject
 import play.api.data._
 import play.api.mvc._
+import models.GameManager
 
 class GameController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
 

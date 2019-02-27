@@ -1,6 +1,4 @@
-package controllers
-
-import models.Game
+package models
 
 import scala.collection.mutable
 import scala.util.Random

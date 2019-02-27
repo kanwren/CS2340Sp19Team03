@@ -1,10 +1,11 @@
 package controllers
 
 import javax.inject.Inject
-
 import play.api.data._
 import play.api.i18n._
 import play.api.mvc._
+
+import scala.collection.mutable.ArrayBuffer
 
 /**
   * The classic WidgetController using MessagesAbstractController.
@@ -18,7 +19,7 @@ import play.api.mvc._
   */
 
 object PlayerInput {
-  val players = scala.collection.mutable.ArrayBuffer[String]()
+  val players: ArrayBuffer[String] = scala.collection.mutable.ArrayBuffer[String]()
 }
 
 class WidgetController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
@@ -32,17 +33,17 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
     // of the "WidgetController" references are inside the .scala file.
     private val postUrl = routes.WidgetController.createWidget()
 
-    def index = Action {
+    def index: Action[AnyContent] = Action {
         Ok(views.html.index())
     }
 
-    def listWidgets = Action { implicit request: MessagesRequest[AnyContent] =>
+    def listWidgets: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
         // Pass an unpopulated form to the template
         Ok(views.html.listWidgets(PlayerInput.players, form, postUrl))
     }
 
     // This will be the action that handles our form post
-    def createWidget = Action { implicit request: MessagesRequest[AnyContent] =>
+    def createWidget: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
         val errorFunction = { formWithErrors: Form[Data] =>
             // This is the bad case, where the form had validation errors.
             // Let's show the user the form again, with the errors highlighted.
@@ -50,7 +51,7 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
             BadRequest(views.html.listWidgets(PlayerInput.players, formWithErrors, postUrl))
         }
 
-        val successFunction = { data: Data =>
+        val successFunction: Data => Result = { data: Data =>
             // This is the good case, where the form was successfully parsed as a Data object.
             //val widget = Widget(name = data.name, price = data.price)
             if (!PlayerInput.players.contains(data.name)) PlayerInput.players.append(data.name)

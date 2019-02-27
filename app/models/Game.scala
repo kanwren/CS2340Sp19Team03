@@ -1,5 +1,5 @@
 package models
-import scala.collection.mutable.HashMap
+import scala.collection.mutable
 
 /**
  * Presentation object used for displaying data in a template.
@@ -8,4 +8,4 @@ import scala.collection.mutable.HashMap
  * which are used for reads, distinct from the form processing DTO,
  * which are used for writes.
  */
-case class Game(players: HashMap[String, Int])
+case class Game(players: mutable.HashMap[String, Int])

@@ -16,10 +16,6 @@ object GameManager {
 
   private def generateId: String = {
     val id = Random.alphanumeric.take(Game.idLength).mkString
-    if (games contains id) {
-      generateId
-    } else {
-      id
-    }
+    if (games contains id) generateId else id
   }
 }

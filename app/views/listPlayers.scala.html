@@ -1,0 +1,53 @@
+@(players: Seq[String], gameId: String, form: Form[PlayerForm.PlayerData])(implicit request: MessagesRequestHeader)
+
+  @main("Players") {
+
+    <p>Game ID: @gameId</p>
+
+    <h1>Players</h1>
+
+    @* Flash shows updates to a page *@
+    @request.flash.data.map{ case (name, value) =>
+      <div>@name: @value</div>
+    }
+
+    <table>
+      <thead>
+        <tr><th>Name</th>
+      </thead>
+      <tbody>
+      @for(p <- players) {
+        <tr><td>@p</td></tr>
+      }
+      </tbody>
+    </table>
+
+    <hr/>
+
+    @* Global errors are not tied to any particular form field *@
+    @if(form.hasGlobalErrors) {
+      @form.globalErrors.map { error: FormError =>
+        <div>
+          @error.key: @error.message
+        </div>
+      }
+    }
+
+    @helper.form(action = routes.PlayerLobbyController.addPlayer(gameId)) {
+      @helper.CSRF.formField
+
+      @helper.inputText(form("name"), '_label -> "Name:")
+
+      @if(players.length < 6){
+       <button>Add Player</button>
+      } else {
+       <button disabled>Add Player</button>
+      }
+    }
+
+    @if(players.length >= 3){
+       <button onclick="location.href='@routes.GameController.startGame(gameId)'" type="button">Start Game!</button>
+    } else {
+       <button onclick="location.href='@routes.GameController.startGame(gameId)'" type="button" disabled>Start Game!</button>
+    }
+  }

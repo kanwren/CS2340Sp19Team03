@@ -18,10 +18,8 @@ class BoardController @Inject()(cc: MessagesControllerComponents) extends Messag
 
   import WidgetForm._
 
-  private val radius: Int = 100;
-
   def viewBoard = Action { implicit request: MessagesRequest[AnyContent] =>
     // Pass an unpopulated form to the template
-    Ok(views.html.gameboard(radius))
+    Ok(views.html.gameboard())
   }
 }

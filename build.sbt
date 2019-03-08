@@ -1,4 +1,4 @@
-name := """play-scala-forms-example"""
+name := """RISK Board Game"""
 
 version := "2.7.x"
 

@@ -3,22 +3,22 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.GameController.index
-POST    /                           controllers.GameController.joinGame
+GET     /                                       controllers.GameController.index
+POST    /                                       controllers.GameController.joinGame
 
-GET     /createGame                 controllers.GameController.createGame
+GET     /createGame                             controllers.GameController.createGame
 
 # Player Entry
-GET     /lobby/:gameId              controllers.PlayerLobbyController.listPlayers(gameId)
-POST    /lobby/:gameId              controllers.PlayerLobbyController.addPlayer(gameId)
+GET     /lobby/$gameId<[A-Za-z0-9]{4}>          controllers.PlayerLobbyController.listPlayers(gameId)
+POST    /lobby/$gameId<[A-Za-z0-9]{4}>          controllers.PlayerLobbyController.addPlayer(gameId)
 
 # Game Board
-GET     /board                      controllers.GameBoardController.showMap
+GET     /board                                  controllers.GameBoardController.showMap
 
 # Initialized
-GET     /startGame/:gameId          controllers.GameController.startGame(gameId)
+GET     /startGame/$gameId<[A-Za-z0-9]{4}>      controllers.GameController.startGame(gameId)
 
-GET     /:gameId                    controllers.GameController.showGame(gameId)
+GET     /$gameId<[A-Za-z0-9]{4}>                controllers.GameController.showGame(gameId)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                           controllers.Assets.versioned(path="/public", file: Asset)

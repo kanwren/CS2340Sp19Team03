@@ -26,9 +26,10 @@ for (var i in rsrGroups) {
         setLinkedRegionMouseHandler(region);
     } else {
         for (var j = 0; j < region.length; j++) {
-            region[j].node.style.strokeWidth = BORDER_WIDTH;
-            region[j].node.style.stroke = BORDER_COLOR;
-            region[j].mouseover(function (e) {
+            var territory = region[j];
+            territory.node.style.strokeWidth = BORDER_WIDTH;
+            territory.node.style.stroke = BORDER_COLOR;
+            territory.mouseover(function (e) {
                 this.node.style.opacity = HIGHLIGHT_OPACITY;
             }).mouseout(function (e) {
                 this.node.style.opacity = 1;

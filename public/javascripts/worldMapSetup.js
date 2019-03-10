@@ -1,3 +1,5 @@
+//import { rsr } from 'worldMap'
+
 // Regions that contain multiple territories that would normally be highlightable
 // on their own. We make sure to filter them out in the following for loops
 var linkedRegions = [indonesia, japan, newguinea, greatbritain, india, easternaustralia];
@@ -14,6 +16,8 @@ function setLinkedRegionMouseHandler(linkedRegion) {
         for (var j = 0; j < linkedRegion.length; j++) linkedRegion[j].node.style.opacity = 1;
     });
 }
+
+
 
 for (var i in rsrGroups) {
     var region = rsrGroups[i];
@@ -36,4 +40,11 @@ for (var i in rsrGroups) {
             });
         }
     }
+
 }
+
+
+
+
+
+

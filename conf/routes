@@ -6,18 +6,16 @@
 GET     /                                       controllers.GameController.index
 POST    /                                       controllers.GameController.joinGame
 
-GET     /createGame                             controllers.GameController.createGame
-
 # Player Entry
-GET     /lobby/$gameId<[A-Za-z0-9]{4}>          controllers.PlayerLobbyController.listPlayers(gameId)
 POST    /lobby/$gameId<[A-Za-z0-9]{4}>          controllers.PlayerLobbyController.addPlayer(gameId)
 
-# Game Board
-GET     /board                                  controllers.GameBoardController.showMap
+# Trigger a game creation and redirect to showGame
+GET     /createGame                             controllers.GameController.createGame
 
-# Initialized
+# Trigger transfer to the Assignment state and redirect to showGame
 GET     /startGame/$gameId<[A-Za-z0-9]{4}>      controllers.GameController.startGame(gameId)
 
+# Redirects to the appropriate route based on game state
 GET     /$gameId<[A-Za-z0-9]{4}>                controllers.GameController.showGame(gameId)
 
 # Map static resources from the /public folder to the /assets URL path

@@ -13,7 +13,7 @@ class Game(val gameId: String) {
   def addPlayerToLobby(name: String): Unit = lobbiedPlayers += name
 
   def startGame(): Unit = {
-    gameState = Running
+    gameState = Assigning
     val armies = 50 - 5 * lobbiedPlayers.length
     players = Random.shuffle(for {
       name <- lobbiedPlayers

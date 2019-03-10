@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject.Inject
-import models.{Game, GameManager}
+import models._
 import play.api.data._
 import play.api.mvc._
 
@@ -12,7 +12,7 @@ class GameController @Inject()(cc: MessagesControllerComponents) extends Message
   }
 
   def createGame: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Redirect(routes.PlayerLobbyController.listPlayers(GameManager.makeNewGame))
+    Redirect(routes.GameController.showGame(GameManager.makeNewGame))
   }
 
   def startGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -28,15 +28,24 @@ class GameController @Inject()(cc: MessagesControllerComponents) extends Message
 
     def successFunction(gameId: JoinForm.GameId): Result =
       onGame(gameId.id) { _ =>
-        Redirect(routes.PlayerLobbyController.listPlayers(gameId.id))
+        Redirect(routes.GameController.showGame(gameId.id))
       }
 
     JoinForm.form.bindFromRequest.fold(errorFunction, successFunction)
   }
 
   def showGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { g: Game =>
-      Ok(views.html.game(g))
+    onGame(gameId) { game: Game =>
+      game.gameState match {
+        case Lobbying =>
+          Ok(views.html.lobby(game.getLobbiedPlayers, gameId, PlayerForm.form))
+        case Assigning =>
+          Ok(views.html.game(game))
+        case Running =>
+          Ok(views.html.gameboard())
+        case _ =>
+          Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
+      }
     }
   }
 

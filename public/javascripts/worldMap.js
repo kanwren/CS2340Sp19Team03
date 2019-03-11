@@ -33,7 +33,7 @@ var path3846 = rsr.path("m 337.625,476.25 -6.67479,10.13149 -9.73146,0.0873 1.84
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#d1800e'
-}).data('id', 'path3846');
+}).data('id', 9);
 var path3756 = rsr.path("m 316.62616,600.88687 -2.75726,7.35272 11.02907,4.1359 11.02906,-1.83818 -12.4077,-3.67636 z").attr({
     id: 'path3756',
     class: 'territory',
@@ -62,7 +62,7 @@ var path3758 = rsr.path("m 1146.0938,414.3125 -5.9688,11.9375 1.375,7.8125 -9.65
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#da70d6'
-}).data('id', 'path3758');
+}).data('id', 3);
 var path3760 = rsr.path("m 1112.5572,549.41789 c 1.8382,0 12.4077,0.45954 12.4077,0.45954 l -5.0549,7.81226 -6.8932,3.67636 -4.5955,-1.83818 3.6764,-4.1359 z").attr({
     id: 'path3760',
     class: 'continent',
@@ -86,7 +86,7 @@ var path3764 = rsr.path("m 1118.0718,378.92688 12.4077,-8.73135 32.1681,15.62452
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#da70d6'
-}).data('id', 'path3764');
+}).data('id', 40);
 var path3766 = rsr.path("m 1174.7106,389.84106 7.123,-0.57443 5.9741,-5.74431 1.3786,0.68932 -0.8042,3.21681 -7.6974,6.54851 -4.1359,-1.03397 -2.2977,-1.26375 z").attr({
     id: 'path3766',
     class: 'continent',
@@ -137,7 +137,7 @@ var path3776 = rsr.path("m 991.57588,389.65135 5.5241,-5.68657 -2.11216,-7.79873
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#da70d6'
-}).data('id', 'path3776');
+}).data('id', 39);
 var path3778 = rsr.path("m 1008.6356,360.08117 6.9864,17.54714 15.2725,0.81237 4.5492,2.59957 4.2243,-3.73689 5.3617,-15.27251 4.3868,-3.41194 -4.7118,-7.14884 -0.3249,-5.19915 5.3616,-5.84905 -7.6363,-7.14883 -6.4989,7.31131 -7.3113,2.59957 -2.7621,6.49894 -6.6614,3.087 -1.7872,4.71173 -4.7117,-2.27463 z").attr({
     id: 'path3778',
     class: 'continent',
@@ -402,7 +402,7 @@ var path3039 = rsr.path("m 1089,158.875 7.75,5.625 9.5,3 0.125,1.875 -3.875,1.12
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#359336'
-}).data('id', 'path3039');
+}).data('id', 30);
 var path3041 = rsr.path("m 1094.625,180.125 4.875,9.625 -2.5,5.25 -5.25,4 -6.75,4.25 -2.125,-1.375 -3.25,0 -3.625,4.5 -3.375,1.125 5.375,1.625 5.375,-2 5.875,-0.25 3.75,5.25 1.5,-6.25 10,-0.875 3.375,-4.875 -0.375,-3.25 -3.25,-4.125 0.375,-4.25 0.875,-0.75 -0.75,-3 -4.375,-4.75 -3.375,-1.875 -2.375,0.25 z").attr({
     id: 'path3041',
     class: 'continent',
@@ -437,7 +437,7 @@ var path3055 = rsr.path("m 948,237.25 -6.5,-5.5 -8.25,0.25 -4.75,6 -3.75,0.75 -5
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#359336'
-}).data('id', 'path3055');
+}).data('id', 28);
 var path3057 = rsr.path("m 889,321 5.5,7 0.75,5 -4.25,3.25 -2.75,-1.5 -1,-7.75 z").attr({
     id: 'path3057',
     class: 'continent',
@@ -506,7 +506,7 @@ var path3930 = rsr.path("m 554.5,107.25 -3.875,3.625 0.375,1.375 3.75,0.875 4.37
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#309bdd'
-}).data('id', 'path3930');
+}).data('id', 13);
 var path3932 = rsr.path("m 539,127.625 -6.25,1.625 -4.5,2.5 -1.875,-3.375 3,-5 -2.125,-2 0,-1.75 5.5,-0.75 1.875,-3.125 6.875,0.25 1.25,2.125 -3.125,3.875 z").attr({
     id: 'path3932',
     class: 'continent',
@@ -532,33 +532,23 @@ japan.push(path3039, path3041, path3043, path3045);
 india.push(path3055, path3057);
 europe.push(scandinavia, westerneurope, southerneurope, northerneurope, ukraine, iceland);
 greatbritain.push(path3930, path3932);
-var multipath = [argentina, easternaustralia, newguinea, indonesia, japan, india, greatbritain];
 
+var linkedRegions = [indonesia, japan, newguinea, greatbritain, india, easternaustralia, argentina];
 
+function setTerritoryText() {
+    for (var i in allTerrs) {
+        var region = allTerrs[i], bbox = region.getBBox();
+        var text = undefined;
 
-// rsr.region.setID = function(id) {
-//     this.id = id;
-// }
+        var x = bbox.x + bbox.width / 2;
+        var y = bbox.y + bbox.height / 2;
 
-// argentina.setID('Argentina');
-// easternaustralia.setID('Eastern Australia');
-// newguinea.setID('New Guinea');
-// indonesia.setID('Indonesia');
-// japan.setID('Japan');
-// india.setID('India');
-// greatbritain.setID('Great Britain');
-
-
-
-
-
-
-
-for (var i in allTerrs) {
-    var region = allTerrs[i];
-    var bbox = region.getBBox();
-    var text = rsr.text(bbox.x + bbox.width/2, bbox.y + bbox.height/2, region.data('id'));
+        if (linkedRegions.indexOf(region) !== -1) text = rsr.text(x, y, region[0].data('id'));
+        else text = rsr.text(x, y, region.data('id'));
+    }
 }
+
+setTerritoryText();
 
 // var camBBox = centralamerica.getBBox();
 // var camText = rsr.text(camBBox.x + camBBox.width/3, camBBox.y + camBBox.height/3, centralamerica.get('id'));
@@ -598,13 +588,3 @@ for (var i in allTerrs) {
 
 // var iceBBox = iceland.getBBox();
 // var iceText = rsr.text(iceBBox.x + iceBBox.width/3, iceBBox.y + iceBBox.height/2 + 15, iceland.get('id'));
-
-
-
-
-
-
-
-
-//export { rsr };
-

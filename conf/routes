@@ -6,8 +6,7 @@
 GET     /                                       controllers.GameController.index
 POST    /                                       controllers.GameController.joinGame
 
-# Player Entry
-POST    /lobby/$gameId<[A-Za-z0-9]{4}>          controllers.PlayerLobbyController.addPlayer(gameId)
+GET     /board                                  controllers.GameBoardController.showBoard
 
 # Trigger a game creation and redirect to showGame
 GET     /createGame                             controllers.GameController.createGame

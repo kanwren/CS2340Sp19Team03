@@ -15,8 +15,9 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     Ok(views.html.index(JoinForm.form))
   }
 
-  def createGame: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Redirect(routes.GameController.showGame(GameManager.makeNewGame))
+  def createGame: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    val id = GameManager.makeNewGame
+    Redirect(routes.GameController.index()).flashing("INFO" -> s"Your game ID is: $id")
   }
 
   def startGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -27,12 +28,18 @@ class GameController @Inject()(cc: MessagesControllerComponents)
   }
 
   def joinGame: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    def errorFunction(formWithErrors: Form[JoinForm.GameId]) =
+    def errorFunction(formWithErrors: Form[JoinForm.JoinRequest]) =
       BadRequest(views.html.index(formWithErrors))
 
-    def successFunction(gameId: JoinForm.GameId): Result =
-      onGame(gameId.id) { _ =>
-        Redirect(routes.GameController.showGame(gameId.id))
+    def successFunction(joinRequest: JoinForm.JoinRequest): Result =
+      onGame(joinRequest.id) { game =>
+        val name = joinRequest.playerName
+        if (game.getLobbiedPlayers.contains(name)) {
+          Redirect(routes.GameController.showGame(joinRequest.id)).flashing("ERROR" -> s"Player with name $name already in queue")
+        } else {
+          game.addPlayerToLobby(name)
+          Redirect(routes.GameController.showGame(joinRequest.id))
+        }
       }
 
     JoinForm.form.bindFromRequest.fold(errorFunction, successFunction)
@@ -43,7 +50,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     onGame(gameId) { game: Game =>
       game.gameState match {
         case Lobbying =>
-          Ok(views.html.lobby(game.getLobbiedPlayers, gameId, PlayerForm.form)).withCookies(Cookie("playerName", pName)).bakeCookies()
+          Ok(views.html.lobby(game.getLobbiedPlayers, gameId)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Assigning =>
           Ok(views.html.game(game)).withCookies(Cookie("playerName", pName))
         case Running =>

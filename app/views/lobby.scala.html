@@ -1,4 +1,4 @@
-@(players: Seq[String], gameId: String, form: Form[PlayerForm.PlayerData])(implicit request: MessagesRequestHeader)
+@(players: Seq[String], gameId: String)(implicit request: MessagesRequestHeader)
 
   @main("Players") {
 
@@ -23,27 +23,6 @@
     </table>
 
     <hr/>
-
-    @* Global errors are not tied to any particular form field *@
-    @if(form.hasGlobalErrors) {
-      @form.globalErrors.map { error: FormError =>
-        <div>
-          @error.key: @error.message
-        </div>
-      }
-    }
-
-    @helper.form(action = routes.PlayerLobbyController.addPlayer(gameId)) {
-      @helper.CSRF.formField
-
-      @helper.inputText(form("name"), '_label -> "Name:")
-
-      @if(players.length < 6){
-       <button>Add Player</button>
-      } else {
-       <button disabled>Add Player</button>
-      }
-    }
 
     @if(players.length >= 3){
        <button onclick="location.href='@routes.GameController.startGame(gameId)'" type="button">Start Game!</button>

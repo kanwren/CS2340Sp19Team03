@@ -532,9 +532,8 @@ japan.push(path3039, path3041, path3043, path3045);
 india.push(path3055, path3057);
 europe.push(scandinavia, westerneurope, southerneurope, northerneurope, ukraine, iceland);
 greatbritain.push(path3930, path3932);
+
 var multipath = [argentina, easternaustralia, newguinea, indonesia, japan, india, greatbritain];
-
-
 
 // rsr.region.setID = function(id) {
 //     this.id = id;
@@ -548,63 +547,49 @@ var multipath = [argentina, easternaustralia, newguinea, indonesia, japan, india
 // india.setID('India');
 // greatbritain.setID('Great Britain');
 
-
-
-
-
-
-
 for (var i in allTerrs) {
     var region = allTerrs[i];
     var bbox = region.getBBox();
-    var text = rsr.text(bbox.x + bbox.width/2, bbox.y + bbox.height/2, region.data('id'));
+    var text = rsr.text(bbox.x + bbox.width / 2, bbox.y + bbox.height / 2, region.data('id'));
 }
 
 var camBBox = centralamerica.getBBox();
-var camText = rsr.text(camBBox.x + camBBox.width/3, camBBox.y + camBBox.height/3, 100);
+var camText = rsr.text(camBBox.x + camBBox.width / 3, camBBox.y + camBBox.height / 3, 100);
 
 var venBBox = venezuela.getBBox();
-var venText = rsr.text(venBBox.x + venBBox.width/3, venBBox.y + venBBox.height/3 + 5, 100);
+var venText = rsr.text(venBBox.x + venBBox.width / 3, venBBox.y + venBBox.height / 3 + 5, 100);
 
 var soeBBox = southerneurope.getBBox();
-var soeText = rsr.text(soeBBox.x + 3 * soeBBox.width/4, soeBBox.y + soeBBox.height/2, 100);
+var soeText = rsr.text(soeBBox.x + 3 * soeBBox.width / 4, soeBBox.y + soeBBox.height / 2, 100);
 
 var scaBBox = scandinavia.getBBox();
-var scaText = rsr.text(scaBBox.x + scaBBox.width/3 - 2, scaBBox.y + scaBBox.height/3 + 14, 100);
+var scaText = rsr.text(scaBBox.x + scaBBox.width / 3 - 2, scaBBox.y + scaBBox.height / 3 + 14, 100);
 
 var wesBBox = westerneurope.getBBox();
-var wesText = rsr.text(wesBBox.x + wesBBox.width/4, wesBBox.y + 3 * wesBBox.height/4, 100);
+var wesText = rsr.text(wesBBox.x + wesBBox.width / 4, wesBBox.y + 3 * wesBBox.height / 4, 100);
 
 var eaaBBox = eastafrica.getBBox();
-var eaaText = rsr.text(eaaBBox.x + eaaBBox.width/2 + 15 , eaaBBox.y + eaaBBox.height/2, 100);
+var eaaText = rsr.text(eaaBBox.x + eaaBBox.width / 2 + 15, eaaBBox.y + eaaBBox.height / 2, 100);
 
 var kamBBox = kamchatka.getBBox();
-var kamText = rsr.text(kamBBox.x + kamBBox.width/2, kamBBox.y + kamBBox.height/6, 100);
+var kamText = rsr.text(kamBBox.x + kamBBox.width / 2, kamBBox.y + kamBBox.height / 6, 100);
 
 var siaBBox = siam.getBBox();
-var siaText = rsr.text(siaBBox.x + siaBBox.width/2, siaBBox.y + siaBBox.height/3, 100);
+var siaText = rsr.text(siaBBox.x + siaBBox.width / 2, siaBBox.y + siaBBox.height / 3, 100);
 
 var indoBBox = indonesia.getBBox();
-var indoText = rsr.text(indoBBox.x + indoBBox.width/2 + 10, indoBBox.y + 4 * indoBBox.height/6, 100);
+var indoText = rsr.text(indoBBox.x + indoBBox.width / 2 + 10, indoBBox.y + 4 * indoBBox.height / 6, 100);
 
 var guiBBox = newguinea.getBBox();
-var guiText = rsr.text(guiBBox.x + guiBBox.width/3, guiBBox.y + guiBBox.height/2, 100);
+var guiText = rsr.text(guiBBox.x + guiBBox.width / 3, guiBBox.y + guiBBox.height / 2, 100);
 
 var wausBBox = westernaustralia.getBBox();
-var wausText = rsr.text(wausBBox.x + wausBBox.width/3, wausBBox.y + wausBBox.height/2, 100);
+var wausText = rsr.text(wausBBox.x + wausBBox.width / 3, wausBBox.y + wausBBox.height / 2, 100);
 
 var eausBBox = easternaustralia.getBBox();
-var eausText = rsr.text(eausBBox.x + 2 * eausBBox.width/3, eausBBox.y + eausBBox.height/2, 100);
+var eausText = rsr.text(eausBBox.x + 2 * eausBBox.width / 3, eausBBox.y + eausBBox.height / 2, 100);
 
 var iceBBox = iceland.getBBox();
-var iceText = rsr.text(iceBBox.x + iceBBox.width/3, iceBBox.y + iceBBox.height/2 + 15, 100);
-
-
-
-
-
-
-
+var iceText = rsr.text(iceBBox.x + iceBBox.width / 3, iceBBox.y + iceBBox.height / 2 + 15, 100);
 
 //export { rsr };
-

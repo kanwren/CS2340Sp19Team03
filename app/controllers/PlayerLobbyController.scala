@@ -5,6 +5,8 @@ import models.Game
 import play.api.data._
 import play.api.mvc._
 
+import scala.collection.mutable
+
 class PlayerLobbyController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with ControllerUtils {
 
   def addPlayer(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -20,7 +22,9 @@ class PlayerLobbyController @Inject()(cc: MessagesControllerComponents) extends 
           Redirect(routes.GameController.showGame(gameId)).flashing("ERROR" -> s"Player with name $name already in queue")
         } else {
           game.addPlayerToLobby(name)
-          Redirect(routes.GameController.showGame(gameId))
+          val parameters: mutable.HashMap[String, Seq[String]] = mutable.HashMap()
+          parameters += "playerName" -> List(name)
+          Redirect(routes.GameController.showGame(gameId).absoluteURL(), parameters.toMap)
         }
       }
 

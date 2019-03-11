@@ -24,6 +24,8 @@ server.pid
 # Icon must end with two \r
 Icon
 
+# Bash scripts
+*.sh
 
 # Thumbnails
 ._*

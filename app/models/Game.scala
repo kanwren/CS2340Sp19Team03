@@ -21,16 +21,18 @@ class Game(val gameId: String) {
       } yield Player(name, armies, gameId))
 
       var i: Int = 0
-      println("Size: ", board.territories.size)
       for(e <- Random.shuffle(0 to 41)) {
-        println("Territory #: ", e)
         board.territories(e).owner = Some(players(i % players.size))
-        board.territories(e).armies += 1
-//        players(i % players.size).armies -= 1
+        players(i % players.size).numberOfTerritories += 1
         i += 1
       }
 
+      for(territory <- board.territories.values) {
+        val owner = territory.owner.get
+        val armyDist = owner.armies / owner.numberOfTerritories
 
+        territory.armies = armyDist
+      }
 
 
     }

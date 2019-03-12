@@ -66,7 +66,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
         case Assigning =>
           Ok(views.html.game(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Running =>
-          Ok(views.html.gameboard()).withCookies(Cookie("playerName", pName)).bakeCookies()
+          Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case _ =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
       }

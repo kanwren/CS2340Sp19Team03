@@ -62,7 +62,7 @@ var path3758 = rsr.path("m 1146.0938,414.3125 -5.9688,11.9375 1.375,7.8125 -9.65
     'stroke-width': '0',
     'stroke-opacity': '1',
     'fill': '#da70d6'
-}).data('id', 3);
+}).data('id', 38);
 var path3760 = rsr.path("m 1112.5572,549.41789 c 1.8382,0 12.4077,0.45954 12.4077,0.45954 l -5.0549,7.81226 -6.8932,3.67636 -4.5955,-1.83818 3.6764,-4.1359 z").attr({
     id: 'path3760',
     class: 'continent',
@@ -518,7 +518,6 @@ var path3932 = rsr.path("m 539,127.625 -6.25,1.625 -4.5,2.5 -1.875,-3.375 3,-5 -
 greatbritain.attr({'id': 'great-britain', 'class': 'continent', 'parent': 'europe', 'name': 'greatbritain'});
 greatbritain.data('id', 13);
 var rsrGroups = [southamerica, argentina, australia, easternaustralia, newguinea, indonesia, africa, northamerica, asia, japan, india, europe, greatbritain];
-var allTerrs = [brazil, peru, venezuela, argentina, westernaustralia, easternaustralia, newguinea, indonesia, southafrica, eastafrica, congo, egypt, northafrica, madagascar, centralamerica, westernunitedstates, easternunitedstates, quebec, ontario, alaska, alberta, northwestterritory, greenland, siam, china, middleeast, afghanistan, ural, mongolia, irkutsk, kamchatka, yakutsk, siberia, japan, india, scandinavia, westerneurope, southerneurope, northerneurope, ukraine, iceland, greatbritain];
 southamerica.push(brazil, peru, venezuela);
 argentina.push(path3846, path3756);
 australia.push(westernaustralia);
@@ -533,22 +532,8 @@ india.push(path3055, path3057);
 europe.push(scandinavia, westerneurope, southerneurope, northerneurope, ukraine, iceland);
 greatbritain.push(path3930, path3932);
 
+var allTerrs = [brazil, peru, venezuela, argentina, westernaustralia, easternaustralia, newguinea, indonesia, southafrica, eastafrica, congo, egypt, northafrica, madagascar, centralamerica, westernunitedstates, easternunitedstates, quebec, ontario, alaska, alberta, northwestterritory, greenland, siam, china, middleeast, afghanistan, ural, mongolia, irkutsk, kamchatka, yakutsk, siberia, japan, india, scandinavia, westerneurope, southerneurope, northerneurope, ukraine, iceland, greatbritain];
 var linkedRegions = [indonesia, japan, newguinea, greatbritain, india, easternaustralia, argentina];
-
-function setTerritoryText() {
-    for (var i in allTerrs) {
-        var region = allTerrs[i], bbox = region.getBBox();
-        var text = undefined;
-
-        var x = bbox.x + bbox.width / 2;
-        var y = bbox.y + bbox.height / 2;
-
-        if (linkedRegions.indexOf(region) !== -1) text = rsr.text(x, y, region[0].data('id'));
-        else text = rsr.text(x, y, region.data('id'));
-    }
-}
-
-setTerritoryText();
 
 // var camBBox = centralamerica.getBBox();
 // var camText = rsr.text(camBBox.x + camBBox.width/3, camBBox.y + camBBox.height/3, centralamerica.get('id'));

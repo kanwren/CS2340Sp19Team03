@@ -13,3 +13,4 @@ class Board {
     territories(id).armies = armies
   }
 }
+

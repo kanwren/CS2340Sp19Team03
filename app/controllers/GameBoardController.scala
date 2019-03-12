@@ -7,8 +7,14 @@ import play.api.mvc._
 class GameBoardController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with ControllerUtils {
 
   val testGame: Game = GameManager.getGameById(GameManager.makeNewGame).get
+  val playerCount: Int = 35
   testGame.gameState = Running
-  testGame.players = Seq(new Player("A", 35, "abcd"), new Player("B", 35, "abcd"), new Player("C", 35, "abcd"), new Player("D", 35, "abcd"))
+  testGame.playerCount = Seq(
+    new Player("A", playerCount, "abcd"),
+    new Player("B", playerCount, "abcd"),
+    new Player("C", playerCount, "abcd"),
+    new Player("D", playerCount, "abcd")
+  )
   def boardTest(): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     Ok(views.html.gameboard(testGame))
   }

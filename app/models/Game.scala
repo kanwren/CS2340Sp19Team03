@@ -12,12 +12,20 @@ class Game(val gameId: String) {
 
   def addPlayerToLobby(name: String): Unit = lobbiedPlayers += name
 
-  def startGame(): Unit = {
-    gameState = Assigning
-    val armies = 50 - 5 * lobbiedPlayers.length
-    players = Random.shuffle(for {
-      name <- lobbiedPlayers
-    } yield Player(name, armies, gameId))
+  def startAssignment(): Unit = {
+    if (gameState == Lobbying) {
+      gameState = Assigning
+      val armies = 50 - 5 * lobbiedPlayers.length
+      players = Random.shuffle(for {
+        name <- lobbiedPlayers
+      } yield Player(name, armies, gameId))
+    }
+  }
+
+  def startPlay(): Unit = {
+    if (gameState == Assigning) {
+      gameState = Running
+    }
   }
 
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers

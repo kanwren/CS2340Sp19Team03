@@ -16,13 +16,6 @@ class GameController @Inject()(cc: MessagesControllerComponents) extends Message
     Redirect(routes.GameController.index()).flashing("INFO" -> s"Your game ID is: $id")
   }
 
-  def startGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      game.startGame()
-      Redirect(routes.GameController.showGame(gameId))
-    }
-  }
-
   def joinGame: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     def errorFunction(formWithErrors: Form[JoinForm.JoinRequest]) =
       BadRequest(views.html.index(formWithErrors))
@@ -41,6 +34,20 @@ class GameController @Inject()(cc: MessagesControllerComponents) extends Message
     JoinForm.form.bindFromRequest.fold(errorFunction, successFunction)
   }
 
+  def startAssignment(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.startAssignment()
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
+  def startPlay(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.startPlay()
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
   def showGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
       game.gameState match {
@@ -49,7 +56,7 @@ class GameController @Inject()(cc: MessagesControllerComponents) extends Message
         case Assigning =>
           Ok(views.html.game(game))
         case Running =>
-          Ok(views.html.gameboard())
+          Ok(views.html.gameboard(game))
         case _ =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
       }

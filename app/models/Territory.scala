@@ -1,5 +1,6 @@
 package models
 
+import play.api.Play
 import play.api.libs.json._
 
 class Territory(val id: Int, val name: String, val parent: String) {
@@ -13,7 +14,7 @@ object Territory {
   def adjacencies(id: Int): List[Int] = territoryData(id).adjacencies
 
   val territoryData: Map[Int, TerritoryDatum] = {
-    val contents = scala.io.Source.fromFile("../../conf/board.json").mkString
+    val contents = scala.io.Source.fromFile("conf/board.json").mkString
     val json: JsValue = Json.parse(contents)
     implicit val datumReads: Reads[TerritoryDatum] = Json.reads[TerritoryDatum]
     val result: List[TerritoryDatum] = json.as[List[TerritoryDatum]]

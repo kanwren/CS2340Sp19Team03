@@ -19,6 +19,22 @@ class Game(val gameId: String) {
       players = Random.shuffle(for {
         name <- lobbiedPlayers
       } yield Player(name, armies, gameId))
+
+      var i: Int = 0
+      for(e <- Random.shuffle(0 to 41)) {
+        board.territories(e).owner = Some(players(i % players.size))
+        players(i % players.size).numberOfTerritories += 1
+        i += 1
+      }
+
+      for(territory <- board.territories.values) {
+        val owner = territory.owner.get
+        val armyDist = owner.armies / owner.numberOfTerritories
+
+        territory.armies = armyDist
+      }
+
+
     }
   }
 

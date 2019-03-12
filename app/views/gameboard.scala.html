@@ -10,7 +10,7 @@
         <div style="float: left">
             <h3>Current Armies</h3>
             @for(i <- 0 until game.board.territories.size) {
-                <p style="margin: 0">@i. @game.board.territories(i).name: <b>@game.board.territories(i).armies</b></p>
+                <p style="margin: 0">@i. @game.board.territories(i).name: <b>@game.board.territories(i).armies</b>, owner: @game.board.territories(i).owner</p>
             }
         </div>
     </div>
@@ -26,7 +26,7 @@
 
             var x = bbox.x + bbox.width / 2;
             var y = bbox.y + bbox.height / 2;
-            
+
             if (linkedRegions.indexOf(region) !== -1) text = rsr.text(x, y, region[0].data('id'));
             else text = rsr.text(x, y, region.data('id'));
         }

@@ -3,13 +3,17 @@
 @main("Board") {
     <script src="@routes.Assets.versioned("javascripts/raphael-min.js")"></script>
 
-
     <h1>RISK Board</h1>
-
     <hr/>
-
-
-    <div id="rsr"></div>
+    <div style="width: 100%; margin: 0 auto">
+        <div id="rsr" style="float: left"></div>
+        <div style="float: left">
+            <h3>Current Armies</h3>
+            @for(i <- 0 until game.board.territories.size) {
+                <p style="margin: 0">@i. @game.board.territories(i).name: <b>@game.board.territories(i).armies</b></p>
+            }
+        </div>
+    </div>
 
     <script src="@routes.Assets.versioned("javascripts/worldMap.js")"></script>
     <script src="@routes.Assets.versioned("javascripts/worldMapSetup.js")"></script>
@@ -22,14 +26,11 @@
 
             var x = bbox.x + bbox.width / 2;
             var y = bbox.y + bbox.height / 2;
-
-            // region[0].data('id')
+            
             if (linkedRegions.indexOf(region) !== -1) text = rsr.text(x, y, region[0].data('id'));
             else text = rsr.text(x, y, region.data('id'));
         }
     }
-
-    console.log(@game.board.territories(0).armies);
 
     setTerritoryText();
     </script>

@@ -9,12 +9,7 @@ class GameBoardController @Inject()(cc: MessagesControllerComponents) extends Me
   val testGame: Game = GameManager.getGameById(GameManager.makeNewGame).get
   val playerCount: Int = 35
   testGame.gameState = Running
-  testGame.playerCount = Seq(
-    new Player("A", playerCount, "abcd"),
-    new Player("B", playerCount, "abcd"),
-    new Player("C", playerCount, "abcd"),
-    new Player("D", playerCount, "abcd")
-  )
+  testGame.players = Seq("A", "B", "C", "D").map(new Player(_, playerCount, testGame.gameId))
   def boardTest(): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     Ok(views.html.gameboard(testGame))
   }

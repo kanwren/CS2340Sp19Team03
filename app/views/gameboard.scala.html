@@ -1,12 +1,14 @@
 @()(implicit request: MessagesRequestHeader)
 
 @main("Board") {
-    <script src="assets/javascripts/raphael-min.js"></script>
+    <script src="@routes.Assets.versioned("javascripts/raphael-min.js")"></script>
 
     <h1>RISK Board</h1>
     <hr/>
+    <div id="root">
+    </div>
     <div id="rsr"></div>
 
-    <script src="assets/javascripts/worldMap.js"></script>
-    <script src="assets/javascripts/worldMapSetup.js"></script>
+    <script src="@routes.Assets.versioned("javascripts/worldMap.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/worldMapSetup.js")"></script>
 }

@@ -21,13 +21,6 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     Redirect(routes.GameController.index()).flashing("INFO" -> s"Your game ID is: $id")
   }
 
-  def startGame(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      game.startGame()
-      Redirect(routes.GameController.showGame(gameId))
-    }
-  }
-
   def joinGame: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     def errorFunction(formWithErrors: Form[JoinForm.JoinRequest]) =
       BadRequest(views.html.index(formWithErrors))
@@ -47,6 +40,20 @@ class GameController @Inject()(cc: MessagesControllerComponents)
       }
 
     JoinForm.form.bindFromRequest.fold(errorFunction, successFunction)
+  }
+
+  def startAssignment(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.startAssignment()
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
+  def startPlay(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.startPlay()
+      Redirect(routes.GameController.showGame(gameId))
+    }
   }
 
   def showGame(gameId: String, playerName: Option[String]): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>

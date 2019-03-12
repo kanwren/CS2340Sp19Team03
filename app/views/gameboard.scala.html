@@ -1,10 +1,12 @@
-@()(implicit request: MessagesRequestHeader)
+@(game: Game)(implicit request: MessagesRequestHeader)
 
 @main("Board") {
     <script src="assets/javascripts/raphael-min.js"></script>
+
     <h1>RISK Board</h1>
     <hr/>
     <div id="rsr"></div>
+
     <script src="assets/javascripts/worldMap.js"></script>
     <script src="assets/javascripts/worldMapSetup.js"></script>
 }

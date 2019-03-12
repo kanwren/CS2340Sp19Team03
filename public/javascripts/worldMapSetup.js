@@ -2,7 +2,7 @@
 
 // Regions that contain multiple territories that would normally be highlightable
 // on their own. We make sure to filter them out in the following for loops
-var linkedRegions = [indonesia, japan, newguinea, greatbritain, india, easternaustralia];
+var linkedRegions = [indonesia, japan, newguinea, greatbritain, india, easternaustralia, argentina];
 
 // Constants
 var HIGHLIGHT_OPACITY = 0.5;
@@ -17,8 +17,6 @@ function setLinkedRegionMouseHandler(linkedRegion) {
     });
 }
 
-
-
 for (var i in rsrGroups) {
     var region = rsrGroups[i];
 
@@ -30,20 +28,14 @@ for (var i in rsrGroups) {
         setLinkedRegionMouseHandler(region);
     } else {
         for (var j = 0; j < region.length; j++) {
-            region[j].node.style.strokeWidth = BORDER_WIDTH;
-            region[j].node.style.stroke = BORDER_COLOR;
-            region[j].mouseover(function (e) {
+            var territory = region[j];
+            territory.node.style.strokeWidth = BORDER_WIDTH;
+            territory.node.style.stroke = BORDER_COLOR;
+            territory.mouseover(function (e) {
                 this.node.style.opacity = HIGHLIGHT_OPACITY;
             }).mouseout(function (e) {
                 this.node.style.opacity = 1;
             });
         }
     }
-
 }
-
-
-
-
-
-

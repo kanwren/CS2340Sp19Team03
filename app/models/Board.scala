@@ -8,4 +8,8 @@ class Board {
       id -> new Territory(id, name, parent)
     }
   }
+
+  def setArmyCount(id: Int, armies: Int): Unit = {
+    territories(id).armies = armies
+  }
 }

@@ -1,12 +1,36 @@
 @(game: Game)(implicit request: MessagesRequestHeader)
 
 @main("Board") {
-    <script src="assets/javascripts/raphael-min.js"></script>
+    <script src="@routes.Assets.versioned("javascripts/raphael-min.js")"></script>
+
 
     <h1>RISK Board</h1>
+
     <hr/>
+
+
     <div id="rsr"></div>
 
-    <script src="assets/javascripts/worldMap.js"></script>
-    <script src="assets/javascripts/worldMapSetup.js"></script>
+    <script src="@routes.Assets.versioned("javascripts/worldMap.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/worldMapSetup.js")"></script>
+
+    <script>
+    function setTerritoryText() {
+        for (var i in allTerrs) {
+            var region = allTerrs[i], bbox = region.getBBox();
+            var text = undefined;
+
+            var x = bbox.x + bbox.width / 2;
+            var y = bbox.y + bbox.height / 2;
+
+            // region[0].data('id')
+            if (linkedRegions.indexOf(region) !== -1) text = rsr.text(x, y, region[0].data('id'));
+            else text = rsr.text(x, y, region.data('id'));
+        }
+    }
+
+    console.log(@game.board.territories(0).armies);
+
+    setTerritoryText();
+    </script>
 }

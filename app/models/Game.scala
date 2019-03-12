@@ -20,20 +20,19 @@ class Game(val gameId: String) {
         name <- lobbiedPlayers
       } yield Player(name, armies, gameId))
 
-      var i: Int = 0
-      for(e <- Random.shuffle(0 to 41)) {
-        board.territories(e).owner = Some(players(i % players.size))
-        players(i % players.size).numberOfTerritories += 1
-        i += 1
+      val playerCycle = Stream.continually(players.toStream).flatten
+      for ((t, p) <- Random.shuffle(board.territories.values).zip(playerCycle)) {
+        t.owner = Some(p)
+        p.numberOfTerritories += 1
       }
 
-      for(territory <- board.territories.values) {
-        val owner = territory.owner.get
-        val armyDist = owner.armies / owner.numberOfTerritories
-
-        territory.armies = armyDist
+      for (player <- players) {
+        val armyDist = player.armies / player.numberOfTerritories
+        val leftOver = player.armies % player.numberOfTerritories
+        val owned = Random.shuffle(board.territories.values.filter(_.owner.forall(_ == player)))
+        owned.take(leftOver).foreach(_.armies = armyDist + 1)
+        owned.drop(leftOver).foreach(_.armies = armyDist)
       }
-
 
     }
   }

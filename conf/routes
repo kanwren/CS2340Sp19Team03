@@ -3,19 +3,22 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.GameController.index
-POST    /                           controllers.GameController.joinGame
+GET     /                                             controllers.GameController.index
+POST    /                                             controllers.GameController.joinGame
 
-GET     /createGame                 controllers.GameController.createGame
+GET     /board                                        controllers.GameBoardController.boardTest()
 
-# Player Entry
-GET     /lobby/:gameId              controllers.PlayerLobbyController.listPlayers(gameId)
-POST    /lobby/:gameId              controllers.PlayerLobbyController.addPlayer(gameId)
+# Trigger a game creation and redirect to showGame
+GET     /createGame                                   controllers.GameController.createGame
 
-# Initialized
-GET     /startGame/:gameId          controllers.GameController.startGame(gameId)
+# Trigger transfer to the Assignment state and redirect to showGame
+GET     /startAssignment/$gameId<[A-Za-z0-9]{4}>      controllers.GameController.startAssignment(gameId)
 
-GET     /:gameId                    controllers.GameController.showGame(gameId)
+GET     /startPlay/$gameId<[A-Za-z0-9]{4}>            controllers.GameController.startPlay(gameId)
+
+# Redirects to the appropriate route based on game state
+GET     /$gameId<[A-Za-z0-9]{4}>                controllers.GameController.showGame(gameId, playerName: Option[String] ?= None)
+
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                                 controllers.Assets.versioned(path="/public", file: Asset)

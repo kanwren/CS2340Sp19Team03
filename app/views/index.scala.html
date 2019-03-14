@@ -1,10 +1,10 @@
-@(form: Form[JoinForm.GameId])(implicit request: MessagesRequestHeader)
+@(form: Form[JoinForm.JoinRequest])(implicit request: MessagesRequestHeader)
 
   @main("Welcome to Risk") {
     <h1>Welcome to Risk</h1>
 
     @request.flash.data.map{ case (name, value) =>
-    <div>@name: @value</div>
+      <div>@name: @value</div>
     }
     <div>
     <a href="@routes.GameController.createGame">Create a game</a>
@@ -13,6 +13,7 @@
       @helper.CSRF.formField
 
       @helper.inputText(form("gameId"), '_label -> "Game ID:")
+      @helper.inputText(form("name"), '_label -> "Name:")
 
       <button>Join Game</button>
     }

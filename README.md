@@ -1,19 +1,20 @@
-# play-scala-forms-example
+# RISK Team 3
 
-[![Build Status](https://travis-ci.org/playframework/play-scala-forms-example.svg?branch=2.6.x)](https://travis-ci.org/playframework/play-scala-forms-example)
+A recreation of the strategy board game RISK. 
 
-This example shows form processing and form helper handling under Play 2.6.x.
+## Running
 
-## How to run
-
-Start the Play app:
+Run by typing:
 
 ```bash
 sbt run
 ```
 
-And open [http://localhost:9000/](http://localhost:9000/)
+Then visit [http://localhost:9000/](http://localhost:9000/)
 
-## Credits
-
-Originally written by Chris Birchall and the Guardian Team: <https://github.com/cb372/play-forms-tutorial>.  Much thanks, especially for the [article](https://www.theguardian.com/info/developer-blog/2015/dec/30/how-to-add-a-form-to-a-play-application).
+## Authors
+Ishan Arya\
+Justin Prindle\
+Rahul Bhethanabotla\
+Pranav Kommabathula\
+Jeffrey Luo

@@ -8,7 +8,12 @@ There is a two step compilation process, one for the frontend UI that
 bundles javascript written in React, and the other for the scala
 backend and templating framework. 
 
-Start the UI compilation (in development mode) by typing:
+Install node modules:
+```bash
+npm install
+```
+
+And start the UI compilation (in development mode) by typing:
 ```bash
 npm run watch
 ```

@@ -10,7 +10,7 @@
         <div style="float: left">
             <h3>Current Armies</h3>
             @for(i <- 0 until game.board.territories.size) {
-                <p style="margin: 0">@i. @game.board.territories(i).name: <b>@game.board.territories(i).armies</b>, owner: @game.board.territories(i).owner</p>
+                <p style="margin: 0">@i. @game.board.territories(i).name: <b>@game.board.territories(i).armies</b>, <i>@game.board.territories(i).owner.get.name</i></p>
             }
         </div>
     </div>

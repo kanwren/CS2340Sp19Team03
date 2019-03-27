@@ -1,10 +1,23 @@
 @(game: Game)(implicit request: MessagesRequestHeader)
+@* @(playerMap: scala.collection.mutable.HashMap[String, Int], names: Seq[String]) *@
+
 
 @main("Board") {
     <h1>RISK Board</h1>
     <hr/>
     <div style="width: 100%; margin: 0 auto">
 
+    <table>
+      <thead>
+        <tr><th>Turn Order</th><th>Player</th>
+      </thead>
+      <tbody>
+      @for((p, i) <- game.players.zipWithIndex) {
+        @* <tr><td>@(i + 1)</td><td>@names(i)</td><td>@playerMap(names(i))</td></tr> *@
+        <tr><td>@(i + 1)</td><td>@p.name</td></tr>
+      }
+      </tbody>
+    </table>
         <div style="float: left">
             <h3>Current Armies</h3>
             @for(i <- 0 until game.board.territories.size) {

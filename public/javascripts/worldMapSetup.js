@@ -15,28 +15,32 @@ function setLinkedRegionMouseHandler(linkedRegion) {
     });
 }
 
-for (var i in rsrGroups) {
-    var region = rsrGroups[i];
+function setTerritoryHover() {
+    for (var i in rsrGroups) {
+        var region = rsrGroups[i];
 
-    if (linkedRegions.indexOf(region) !== -1) {
-        for (var j = 0; j < region.length; j++) {
-            region[j].node.style.strokeWidth = BORDER_WIDTH;
-            region[j].node.style.stroke = BORDER_COLOR;
-        }
-        setLinkedRegionMouseHandler(region);
-    } else {
-        for (var j = 0; j < region.length; j++) {
-            var territory = region[j];
-            territory.node.style.strokeWidth = BORDER_WIDTH;
-            territory.node.style.stroke = BORDER_COLOR;
-            territory.mouseover(function (e) {
-                this.node.style.opacity = HIGHLIGHT_OPACITY;
-            }).mouseout(function (e) {
-                this.node.style.opacity = 1;
-            });
+        if (linkedRegions.indexOf(region) !== -1) {
+            for (var j = 0; j < region.length; j++) {
+                region[j].node.style.strokeWidth = BORDER_WIDTH;
+                region[j].node.style.stroke = BORDER_COLOR;
+            }
+            setLinkedRegionMouseHandler(region);
+        } else {
+            for (var j = 0; j < region.length; j++) {
+                var territory = region[j];
+                territory.node.style.strokeWidth = BORDER_WIDTH;
+                territory.node.style.stroke = BORDER_COLOR;
+                territory.mouseover(function (e) {
+                    this.node.style.opacity = HIGHLIGHT_OPACITY;
+                }).mouseout(function (e) {
+                    this.node.style.opacity = 1;
+                });
+            }
         }
     }
 }
+
+allTerrsText = [];
 
 function setTerritoryText() {
     for (var i in allTerrs) {
@@ -47,7 +51,10 @@ function setTerritoryText() {
 
         if (linkedRegions.indexOf(region) !== -1) text = rsr.text(x, y, region[0].data('id'));
         else text = rsr.text(x, y, region.data('id'));
+
+        allTerrsText.push(text);
     }
 }
 
+setTerritoryHover();
 setTerritoryText();

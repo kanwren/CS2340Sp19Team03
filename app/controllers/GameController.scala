@@ -7,8 +7,10 @@ import akka.stream.Materializer
 import javax.inject.Inject
 import models._
 import play.api.data._
-import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc._
+
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 class GameController @Inject()(cc: MessagesControllerComponents)
                               (implicit system: ActorSystem, mat: Materializer) extends MessagesAbstractController(cc) with ControllerUtils {
@@ -83,7 +85,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
 
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
-
+      ???
     }
   }
 
@@ -93,7 +95,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
       (JsPath \ "parent").write[String]
     )(unlift(Territory.unapply))
     onGame(gameId) { game: Game =>
-
+      ???
     }
   }
 

@@ -9,6 +9,9 @@ import models._
 import play.api.data._
 import play.api.mvc._
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+
 class GameController @Inject()(cc: MessagesControllerComponents)
                               (implicit system: ActorSystem, mat: Materializer) extends MessagesAbstractController(cc) with ControllerUtils {
 
@@ -70,6 +73,31 @@ class GameController @Inject()(cc: MessagesControllerComponents)
         case _ =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
       }
+    }
+  }
+
+  def endTurn(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.turn += 1
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
+  def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      ???
+    }
+  }
+
+  def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val territoryData: Writes[Territory] = (
+      (JsPath \ "name").write[String] and
+      (JsPath \ "parent").write[String] and
+      (JsPath \ "armies").write[Int]
+    )(unlift(Territory.unapply))
+    onGame(gameId) { game: Game =>
+      val json: JsValue = Json.toJson(game.board.territories(territoryId))
+      Ok(json)
     }
   }
 

@@ -213,4 +213,4 @@ typings/
 .dynamodb/
 
 # Bundled webpack javascript file
-public/compiled/
+public/compiled/bundle.js

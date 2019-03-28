@@ -2,16 +2,16 @@ package models
 
 case class Player(name: String, var armies: Int, gameId: String) {
   var numberOfTerritories: Int = 0
+  var northamerica: Int = 0
+  var southamerica: Int = 0
+  var europe: Int = 0
+  var africa: Int = 0
+  var asia: Int = 0
+  var australia: Int = 0
 
-  def calculateAdditionalArmies(board: Board): Unit = {
-  	northamerica: Int = 0
-  	southamerica: Int = 0
-  	europe: Int = 0
-  	africa: Int = 0
-  	asia: Int = 0
-  	australia: Int = 0
+  def updateArmies(board: Board): Unit = {
 
-  	board.territories.foreach(kv => if (kv._1.owner == Some(this)) kv._1.parent match {
+  	board.territories.foreach(case (id, territory) => if (territory.owner == Some(this)) territory.parent match {
   		case "northamerica" => northamerica += 1
   		case "southamerica" => southamerica += 1
   		case "europe" => europe += 1

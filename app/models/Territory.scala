@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 class Territory(val id: Int, val name: String, val parent: String) {
   var armies: Int = 0
-  var owner: Option[Player] = None
+  var owner: Option[Player] = Option(Player("default", 0, ""))
 }
 
 object Territory {

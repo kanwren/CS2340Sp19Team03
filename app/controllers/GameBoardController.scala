@@ -1,15 +1,16 @@
 package controllers
 
 import javax.inject.Inject
-
-import models.Widget
-import play.api.data._
-import play.api.i18n._
+import models.{Game, GameManager, Player, Running}
 import play.api.mvc._
 
-class GameBoardController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
+class GameBoardController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with ControllerUtils {
 
-  def showMap: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    Ok(views.html.gameboard())
+  val testGame: Game = GameManager.getGameById(GameManager.makeNewGame).get
+  val playerCount: Int = 35
+  testGame.gameState = Running
+  testGame.players = Seq("A", "B", "C", "D").map(new Player(_, playerCount, testGame.gameId))
+  def boardTest(): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    Ok(views.html.gameboard(testGame))
   }
 }

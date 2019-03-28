@@ -1,0 +1,21 @@
+@* @(playerMap: scala.collection.mutable.HashMap[String, Int], names: Seq[String]) *@
+@(game: Game)
+
+  @main("Welcome to the Game") {
+
+    <h1>Game Setup</h1>
+
+    <table>
+      <thead>
+        <tr><th>Turn Order</th><th>Player</th><th>Number of Armies</th>
+      </thead>
+      <tbody>
+      @for((p, i) <- game.players.zipWithIndex) {
+        @* <tr><td>@(i + 1)</td><td>@names(i)</td><td>@playerMap(names(i))</td></tr> *@
+        <tr><td>@(i + 1)</td><td>@p.name</td><td>@p.armies</td></tr>
+      }
+      </tbody>
+    </table>
+    <button onclick="location.href='@routes.GameController.startPlay(game.gameId)'" type="button">Start Game</button>
+    <button onclick="location.href='@routes.GameController.index'" type="button">Leave Game</button>
+  }

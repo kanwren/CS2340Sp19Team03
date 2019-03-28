@@ -1,19 +1,34 @@
-# play-scala-forms-example
+# RISK Team 3
 
-[![Build Status](https://travis-ci.org/playframework/play-scala-forms-example.svg?branch=2.6.x)](https://travis-ci.org/playframework/play-scala-forms-example)
+A recreation of the strategy board game RISK. 
 
-This example shows form processing and form helper handling under Play 2.6.x.
+## Running
 
-## How to run
+There is a two step compilation process, one for the frontend UI that
+bundles javascript written in React, and the other for the scala
+backend and templating framework. 
 
-Start the Play app:
+Install node modules:
+```bash
+npm install
+```
+
+And start the UI compilation (in development mode) by typing:
+```bash
+npm run watch
+```
+
+Then run the server by typing:
 
 ```bash
 sbt run
 ```
 
-And open [http://localhost:9000/](http://localhost:9000/)
+Then visit [http://localhost:9000/](http://localhost:9000/)
 
-## Credits
-
-Originally written by Chris Birchall and the Guardian Team: <https://github.com/cb372/play-forms-tutorial>.  Much thanks, especially for the [article](https://www.theguardian.com/info/developer-blog/2015/dec/30/how-to-add-a-form-to-a-play-application).
+## Authors
+Ishan Arya\
+Justin Prindle\
+Rahul Bhethanabotla\
+Pranav Kommabathula\
+Jeffrey Luo

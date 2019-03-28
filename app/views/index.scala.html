@@ -1,9 +1,29 @@
-@()
+@(form: Form[JoinForm.JoinRequest])(implicit request: MessagesRequestHeader)
 
-  @main("Welcome to Play") {
+  @main("Welcome to Risk") {
+    <h1>Welcome to Risk</h1>
+
+    @request.flash.data.map{ case (name, value) =>
+      <div>@name: @value</div>
+    }
     <div>
-      <ul>
-        <li>Please go to <a href="@routes.WidgetController.listWidgets">@routes.WidgetController.listWidgets</a></li>
-      </ul>
+    <a href="@routes.GameController.createGame">Create a game</a>
+    or join a game:
+    @helper.form(action = routes.GameController.joinGame) {
+      @helper.CSRF.formField
+
+      @helper.inputText(form("gameId"), '_label -> "Game ID:")
+      @helper.inputText(form("name"), '_label -> "Name:")
+
+      <button>Join Game</button>
+    }
+
+    @if(form.hasGlobalErrors) {
+      @form.globalErrors.map { error: FormError =>
+        <div>
+          @error.key: @error.message
+        </div>
+      }
+    }
     </div>
   }

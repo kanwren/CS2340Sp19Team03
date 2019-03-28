@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import scriptLoader from 'react-async-script-loader';
+import axios from 'axios';
 
 const HIGHLIGHT_OPACITY = 0.5;
 const UNHIGHLIGHT_OPACITY = 1.0;
@@ -7,18 +8,18 @@ const BORDER_COLOR = "#FFFFFF";
 const BORDER_WIDTH = 1.0;
 const allTerrsText = {};
 
+const ORIG_HEIGHT = 628;
+const ORIG_WIDTH = 1227;
+const MAP_TO_WIDTH_SCALE = 0.8;
+
 class MapComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
             DOMLoaded: false,
             mapInitialized: false,
+            mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH
         }
-    }
-
-    initializeMap() {
-        this.setupTerritoriesMouseAction();
-        this.setupTerritoriesText();
     }
 
     /* This must be here */
@@ -37,25 +38,50 @@ class MapComponent extends Component {
         }
     }
 
-    setMouseOver(region, isLinked) {
+    resize = () => this.resizeMap();
+
+    componentDidMount() {
+        window.addEventListener('resize', this.resize);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.resize);
+    }
+
+    initializeMap() {
+        this.setState({mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH}, () => {
+            this.setupTerritoriesMouseAction();
+            this.setupTerritoriesText();
+        });
+    }
+
+    resizeMap() {
+        this.setState({mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH}, () => {
+            let scale = this.state.mapScaleFactor;
+            window.rsr.setViewBox(0, 0, ORIG_WIDTH, ORIG_HEIGHT, true);
+            window.rsr.setSize(ORIG_WIDTH * scale, ORIG_HEIGHT * scale);
+        });
+    }
+
+    setMouseOver = (region, isLinked) => {
         if (isLinked) {
             for (let i = 0; i < region.length; i++)
                 region[i].node.style.opacity = HIGHLIGHT_OPACITY;
         } else {
             region.node.style.opacity = HIGHLIGHT_OPACITY;
         }
-    }
+    };
 
-    setMouseOut(region, isLinked) {
+    setMouseOut = (region, isLinked) => {
         if (isLinked) {
             for (let i = 0; i < region.length; i++)
                 region[i].node.style.opacity = UNHIGHLIGHT_OPACITY;
         } else {
             region.node.style.opacity = UNHIGHLIGHT_OPACITY;
         }
-    }
+    };
 
-    setMouseDown(region, isLinked) {
+    setMouseDown = (region, isLinked) => {
         let id = undefined;
         if (isLinked) {
             id = region[0].data('id');
@@ -64,52 +90,61 @@ class MapComponent extends Component {
             id = region.data('id');
             this.setTerritoryText(id, id + 1);
         }
-    }
+    };
 
     setupTerritoriesMouseAction() {
-        for (let i in rsrGroups) {
-            let region = rsrGroups[i];
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
 
-            if (linkedRegions.indexOf(region) !== -1) {
+            if (window.linkedRegions.indexOf(region) !== -1) {
                 for (let j = 0; j < region.length; j++) {
                     region[j].node.style.strokeWidth = BORDER_WIDTH;
                     region[j].node.style.stroke = BORDER_COLOR;
                 }
-                region.mouseover(e => this.setMouseOver(region, true)
-                ).mouseout(e => this.setMouseOut(region, true)
-                ).mousedown(e => this.setMouseDown(region, true));
+                region.mouseover(() => this.setMouseOver(region, true)
+                ).mouseout(() => this.setMouseOut(region, true)
+                ).mousedown(() => this.setMouseDown(region, true));
             } else {
                 for (let j = 0; j < region.length; j++) {
                     let terr = region[j];
                     terr.node.style.strokeWidth = BORDER_WIDTH;
                     terr.node.style.stroke = BORDER_COLOR;
 
-                    terr.mouseover(e => this.setMouseOver(terr, false)
-                    ).mouseout(e => this.setMouseOut(terr, false)
-                    ).mousedown(e => this.setMouseDown(terr, false));
+                    terr.mouseover(() => this.setMouseOver(terr, false)
+                    ).mouseout(() => this.setMouseOut(terr, false)
+                    ).mousedown(() => this.setMouseDown(terr, false));
                 }
             }
         }
     }
 
-    setupTerritoriesText() {
-        for (let i in allTerrs) {
-            let region = allTerrs[i], bbox = region.getBBox();
-            let text = undefined;
-            let x = bbox.x + bbox.width / 2;
-            let y = bbox.y + bbox.height / 2;
+    getRegionId = region => {
+        if (window.linkedRegions.indexOf(region) !== -1) return region[0].data('id');
+        else return region.data('id');
+    };
 
-            let terrID = undefined;
-            if (linkedRegions.indexOf(region) !== -1) terrID = region[0].data('id');
-            else terrID = region.data('id');
+    setupTerritoriesText = () => {
+        for (let i in window.allTerrs) {
+            let region = window.allTerrs[i], bbox = region.getBBox();
+            let x = (bbox.x + bbox.width / 2), y = (bbox.y + bbox.height / 2);
 
-            text = rsr.text(x, y, terrID);
-            allTerrsText[terrID] = text;
+            let terrID = this.getRegionId(region);
+
+            allTerrsText[terrID] = window.rsr.text(x, y, terrID);
         }
-    }
+    };
 
     setTerritoryText = (regionID, stringContent) => {
         allTerrsText[regionID].attr({text: stringContent});
+    };
+
+    /*
+    Retrieve current army count associated to territory from input ID
+     */
+    getArmyCountFromId = (id) => {
+        axios.get('/' + this.getGameId()).then(res => {
+            const data = res.data;
+        });
     };
 
     /*
@@ -118,7 +153,6 @@ class MapComponent extends Component {
      */
     getGameId() {
         if (this.state.DOMLoaded) return window.location.pathname.substring(1);
-
         return null;
     }
 

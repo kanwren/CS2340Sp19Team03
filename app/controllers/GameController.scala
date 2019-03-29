@@ -7,6 +7,8 @@ import akka.stream.Materializer
 import javax.inject.Inject
 import models._
 import play.api.data._
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 import play.api.mvc._
 
 class GameController @Inject()(cc: MessagesControllerComponents)
@@ -32,9 +34,9 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           Redirect(routes.GameController.index()).flashing("ERROR" -> s"Player with name $name already in queue")
         } else {
           game.addPlayerToLobby(name)
-//          val parameters: mutable.HashMap[String, Seq[String]] = mutable.HashMap()
-//          parameters += "playerName" -> List(name)
-//          Redirect(routes.GameController.showGame(joinRequest.id).absoluteURL(), parameters.toMap)
+          //          val parameters: mutable.HashMap[String, Seq[String]] = mutable.HashMap()
+          //          parameters += "playerName" -> List(name)
+          //          Redirect(routes.GameController.showGame(joinRequest.id).absoluteURL(), parameters.toMap)
           Redirect(routes.GameController.showGame(joinRequest.id, Some(name)))
         }
       }
@@ -70,6 +72,48 @@ class GameController @Inject()(cc: MessagesControllerComponents)
         case _ =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
       }
+    }
+  }
+
+  def endTurn(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.turn += 1
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
+  def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val playerData: Writes[Player] = Json.writes[Player]
+    implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]
+    onGame(gameId) { game: Game =>
+      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players))
+      Ok(json)
+    }
+  }
+
+  def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val territoryData: Writes[Territory] = (
+      (JsPath \ "id").write[Int] and
+        (JsPath \ "name").write[String] and
+        (JsPath \ "parent").write[String] and
+        (JsPath \ "armies").write[Int]
+      ) (unlift(Territory.unapply))
+    onGame(gameId) { game: Game =>
+      val json: JsValue = Json.toJson(game.board.territories(territoryId))
+      Ok(json)
+    }
+  }
+
+  def getTerritoriesData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val territoryData: Writes[Territory] = (
+      (JsPath \ "id").write[Int] and
+        (JsPath \ "name").write[String] and
+        (JsPath \ "parent").write[String] and
+        (JsPath \ "armies").write[Int]
+      ) (unlift(Territory.unapply))
+    onGame(gameId) { game: Game =>
+      val json: JsValue = Json.toJson(game.board.territories.values)
+      Ok(json)
     }
   }
 

@@ -7,10 +7,9 @@ import akka.stream.Materializer
 import javax.inject.Inject
 import models._
 import play.api.data._
-import play.api.mvc._
-
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import play.api.mvc._
 
 class GameController @Inject()(cc: MessagesControllerComponents)
                               (implicit system: ActorSystem, mat: Materializer) extends MessagesAbstractController(cc) with ControllerUtils {
@@ -82,7 +81,6 @@ class GameController @Inject()(cc: MessagesControllerComponents)
       Redirect(routes.GameController.showGame(gameId))
     }
   }
-
   def addArmiesToTerritory(gameId: String, territoryId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
       game.board.territories(territoryId).armies += amount

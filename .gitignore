@@ -211,3 +211,6 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Bundled webpack javascript file
+public/compiled/bundle.js

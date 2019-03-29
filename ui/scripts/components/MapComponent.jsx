@@ -18,7 +18,9 @@ class MapComponent extends Component {
         this.state = {
             DOMLoaded: false,
             mapInitialized: false,
-            mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH
+            mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH,
+            terrDatas: undefined,
+            curr: undefined
         }
     }
 
@@ -83,12 +85,15 @@ class MapComponent extends Component {
 
     setMouseDown = (region, isLinked) => {
         let id = undefined;
+
         if (isLinked) {
             id = region[0].data('id');
-            this.setTerritoryText(id, id + 1);
+            this.updateArmyCountById(id);
+            this.setTerritoryText(id, this.state.curr);
         } else {
             id = region.data('id');
-            this.setTerritoryText(id, id + 1);
+            this.updateArmyCountById(id);
+            this.setTerritoryText(id, this.state.curr);
         }
     };
 
@@ -129,7 +134,7 @@ class MapComponent extends Component {
             let x = (bbox.x + bbox.width / 2), y = (bbox.y + bbox.height / 2);
 
             let terrID = this.getRegionId(region);
-            let textContent = "armyCount";
+            let textContent = this.updateArmyCountById(terrID);
 
             allTerrsText[terrID] = window.rsr.text(x, y, textContent);
         }
@@ -142,11 +147,17 @@ class MapComponent extends Component {
     /*
     Retrieve current army count associated to territory from input ID
      */
-    getArmyCountFromId = terrID => {
-        axios.get('/' + this.getGameId() + '/' + terrID).then(res => {
+    updateArmyCountById = terrID => {
+        axios.get('/' + terrID + '/' + this.getGameId()).then(res => {
             const terrData = res.data;
-            // let armyCount = terrData.armies;
+            this.setState({
+                curr: terrData.armies
+            })
         });
+    };
+
+    getArmyCounts = () => {
+        // Use new API call
     };
 
     /*

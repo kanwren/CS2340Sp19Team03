@@ -50,3 +50,5 @@ class Game(val gameId: String) {
 object Game {
   val idLength: Int = 4
 }
+
+case class GameInfo(turn: Int)

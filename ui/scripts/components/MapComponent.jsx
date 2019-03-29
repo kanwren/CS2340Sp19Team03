@@ -53,9 +53,10 @@ class MapComponent extends Component {
     initializeMap() {
         this.setState({mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH}, () => {
             this.setupTerritoriesMouseAction();
-            this.setupTerritoriesText();
-            this.updateArmyCounts();
-            console.log(this.state.terrDatas);
+            this.updateArmyCounts(() => {
+                this.setupTerritoriesText();
+                console.log(this.state.terrDatas);
+            });
         });
     }
 
@@ -87,16 +88,17 @@ class MapComponent extends Component {
 
     setMouseDown = (region, isLinked) => {
         let id = undefined;
+        if (isLinked) id = region[0].data('id');
+        else id = region.data('id');
 
-        if (isLinked) {
-            id = region[0].data('id');
-            this.updateArmyCountById(id);
-            this.setTerritoryText(id, this.state.curr);
-        } else {
-            id = region.data('id');
-            this.updateArmyCountById(id);
-            this.setTerritoryText(id, this.state.curr);
-        }
+        const newTerrDatas = this.state.terrDatas.slice();
+        newTerrDatas[id].armies += 1;
+
+        this.setState({
+            terrDatas: newTerrDatas
+        }, () => {
+            this.setTerritoryText(id, this.state.terrDatas[id].armies);
+        });
     };
 
 
@@ -138,9 +140,9 @@ class MapComponent extends Component {
             let x = (bbox.x + bbox.width / 2), y = (bbox.y + bbox.height / 2);
 
             let terrID = this.getRegionId(region);
-            let textContent = this.updateArmyCountById(terrID);
-
-            allTerrsText[terrID] = window.rsr.text(x, y, textContent);
+            this.updateArmyCounts(() => {
+                allTerrsText[terrID] = window.rsr.text(x, y, this.state.terrDatas[terrID].armies);
+            });
         }
     };
 
@@ -151,21 +153,20 @@ class MapComponent extends Component {
     /*
     Retrieve current army count associated to territory from input ID
      */
-    updateArmyCountById = terrID => {
+    updateArmyCountById = (terrID, callback) => {
         axios.get('/' + terrID + '/' + this.getGameId()).then(res => {
-            const terrData = res.data;
             this.setState({
-                curr: terrData.armies
-            })
+                curr: res.data.armies
+            }, callback)
         });
     };
 
-    updateArmyCounts = async () => {
-        let res = await axios.get('/territoriesInfo/' + this.getGameId());
-        let {data} = await res.data;
-        this.setState({
-            terrDatas: data
-        })
+    updateArmyCounts = callback => {
+        axios.get('/territoriesInfo/' + this.getGameId()).then(res => {
+            this.setState({
+                terrDatas: res.data.sort((a, b) => a.id - b.id)
+            }, callback);
+        });
     };
 
     /*

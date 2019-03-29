@@ -54,6 +54,8 @@ class MapComponent extends Component {
         this.setState({mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH}, () => {
             this.setupTerritoriesMouseAction();
             this.setupTerritoriesText();
+            this.updateArmyCounts();
+            console.log(this.state.terrDatas);
         });
     }
 
@@ -156,8 +158,12 @@ class MapComponent extends Component {
         });
     };
 
-    getArmyCounts = () => {
-        // Use new API call
+    updateArmyCounts = async () => {
+        let res = await axios.get('/territoriesInfo/' + this.getGameId());
+        let {data} = await res.data;
+        this.setState({
+            terrDatas: data
+        })
     };
 
     /*

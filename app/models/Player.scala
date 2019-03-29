@@ -36,6 +36,15 @@ case class Player(name: String, var armies: Int, gameId: String) {
   	armies += if (numberOfTerritories < 9) 3 else numberOfTerritories / 3
   } 
 
+  def decrementArmies: Boolean = {
+  	armies -= 1
+  	if (armies == 0) {
+  		false
+  	} else {
+  		true
+  	}
+  }
+
   override def toString: String = name
 }
 

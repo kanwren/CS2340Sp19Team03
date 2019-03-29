@@ -84,13 +84,16 @@ class GameController @Inject()(cc: MessagesControllerComponents)
   }
 
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]
     onGame(gameId) { game: Game =>
-      ???
+      val json: JsValue = Json.toJson(GameInfo(game.turn))
+      Ok(json)
     }
   }
 
   def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     implicit val territoryData: Writes[Territory] = (
+      (JsPath \ "id").write[Int] and
       (JsPath \ "name").write[String] and
       (JsPath \ "parent").write[String] and
       (JsPath \ "armies").write[Int]

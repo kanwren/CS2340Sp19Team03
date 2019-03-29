@@ -11,7 +11,7 @@ case class Player(name: String, var armies: Int, gameId: String) {
 
   def updateArmies(board: Board): Unit = {
 
-  	board.territories.foreach(case (id, territory) => if (territory.owner == Some(this)) territory.parent match {
+  	board.territories.foreach(kv => if (kv._2.owner == Some(this)) kv._2.parent match {
   		case "northamerica" => northamerica += 1
   		case "southamerica" => southamerica += 1
   		case "europe" => europe += 1
@@ -33,7 +33,12 @@ case class Player(name: String, var armies: Int, gameId: String) {
   	if (australia == 4)
   		armies += 2
 
-  	armies += if (numberOfTerritories < 9) 3 else numberOfTerritories / 3
+  	armies += {
+  		if (numberOfTerritories < 9) 
+  			3 
+  		else 
+  			numberOfTerritories / 3
+  	}
   } 
 
   def decrementArmies: Boolean = {

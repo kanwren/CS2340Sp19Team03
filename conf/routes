@@ -25,10 +25,12 @@ GET     /assets/*file                                               controllers.
 
 
 # Game Functionality
+GET     /endTurn/$gameId<[A-Za-z0-9]{4}>                            controllers.GameController.endTurn(gameId)
 GET     /addArmiesToTerritory/:amount/:territoryId/$gameId<[A-Za-z0-9]{4}> controllers.GameController.addArmiesToTerritory(gameId, territoryId: Int, amount: Int)
 
 # Game State endpoints
-GET     /endTurn/$gameId<[A-Za-z0-9]{4}>                            controllers.GameController.endTurn(gameId)
-GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                           controllers.GameController.getGameState(gameId)
-GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>                    controllers.GameController.getTerritoriesData(gameId)
-GET     /territoryInfo/:territoryId/$gameId<[A-Za-z0-9]{4}>         controllers.GameController.getTerritoryData(gameId, territoryId: Int)
+GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                           controllers.GameStateController.getGameState(gameId)
+GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>                    controllers.GameStateController.getTerritoriesData(gameId)
+GET     /territoryInfo/:territoryId/$gameId<[A-Za-z0-9]{4}>         controllers.GameStateController.getTerritoryData(gameId, territoryId: Int)
+GET     /playerInfo/:playerOrder/$gameId<[A-Za-z0-9]{4}>            controllers.GameStateController.getPlayerData(gameId, playerOrder: Int)
+GET     /playersInfo/$gameId<[A-Za-z0-9]{4}>                        controllers.GameStateController.getPlayersData(gameId)

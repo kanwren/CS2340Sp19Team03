@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import MapComponent from './map/MapComponent.jsx';
+import MapComponent from './components/MapComponent.jsx';
 
 class AppComponent extends Component {
     constructor(props) {

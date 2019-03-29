@@ -4,7 +4,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 class Game(val gameId: String) {
-  var turn: Int = 0
+  val turn: Int = 0
   val board: Board = new Board()
   private val lobbiedPlayers: mutable.ArrayBuffer[String] = mutable.ArrayBuffer[String]()
   var players: Seq[Player] = Seq[Player]()
@@ -50,5 +50,3 @@ class Game(val gameId: String) {
 object Game {
   val idLength: Int = 4
 }
-
-case class GameInfo(turn: Int, players: Seq[Player])

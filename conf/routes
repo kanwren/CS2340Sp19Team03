@@ -26,4 +26,5 @@ GET     /assets/*file                                 controllers.Assets.version
 # Game State endpoints
 GET     /endTurn/$gameId<[A-Za-z0-9]{4}>              controllers.GameController.endTurn(gameId)
 GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>             controllers.GameController.getGameState(gameId)
+GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>      controllers.GameController.getTerritoriesData(gameId)
 GET     /:territoryId/$gameId<[A-Za-z0-9]{4}>         controllers.GameController.getTerritoryData(gameId, territoryId: Int)

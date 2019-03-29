@@ -45,7 +45,7 @@ class Game(val gameId: String) {
 
   def nextTurn(): Unit = {
     turn += 1
-    players(turn % players.size).awardArmies()
+    players(turn % players.size).awardArmies(board)
   }
 
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers

@@ -20,7 +20,9 @@ class MapComponent extends Component {
             mapInitialized: false,
             mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH,
             terrDatas: undefined,
-            curr: undefined
+            armiesLeftToAssign: undefined,
+            currGameState: undefined,
+            currentPlayer: undefined
         }
     }
 
@@ -55,7 +57,6 @@ class MapComponent extends Component {
             this.setupTerritoriesMouseAction();
             this.updateArmyCounts(() => {
                 this.setupTerritoriesText();
-                console.log(this.state.terrDatas);
             });
         });
     }
@@ -98,6 +99,9 @@ class MapComponent extends Component {
             terrDatas: newTerrDatas
         }, () => {
             this.setTerritoryText(id, this.state.terrDatas[id].armies);
+
+            // Send POST request
+
         });
     };
 
@@ -151,20 +155,36 @@ class MapComponent extends Component {
     };
 
     /*
-    Retrieve current army count associated to territory from input ID
+    AJAX call to retrieve current army count associated to territory from input ID
      */
     updateArmyCountById = (terrID, callback) => {
-        axios.get('/' + terrID + '/' + this.getGameId()).then(res => {
+        axios.get('/territoryInfo/' + terrID + '/' + this.getGameId()).then(res => {
+            const newTerrDatas = this.state.terrDatas.slice();
+            newTerrDatas[terrID].armies += 1;
+
             this.setState({
-                curr: res.data.armies
+                terrDatas: newTerrDatas
             }, callback)
         });
     };
 
+    /*
+    AJAX call to retrieve all territory army counts
+     */
     updateArmyCounts = callback => {
         axios.get('/territoriesInfo/' + this.getGameId()).then(res => {
             this.setState({
                 terrDatas: res.data.sort((a, b) => a.id - b.id)
+            }, callback);
+        });
+    };
+
+    updateGameState = callback => {
+        axios.get('/gameInfo/' + this.getGameId()).then(res => {
+            let gameInfo = res.data;
+            this.setState({
+                currGameState: gameInfo,
+                currPlayer: gameInfo.players[gameInfo.turn % gameInfo.players.length].name
             }, callback);
         });
     };
@@ -178,9 +198,20 @@ class MapComponent extends Component {
         return null;
     }
 
+    /*
+    REQUESTS TO CHANGE BACKEND DATA
+    */
+    handleEndTurn = callback => {
+        axios.get('/endTurn/' + this.getGameId()).then(() => callback(() => {
+            console.log(this.state.currPlayer);
+        }));
+        console.log("Turn ended!");
+    };
+
     render() {
         return (
             <React.Fragment>
+                <button onClick={() => this.handleEndTurn(this.updateGameState)}>End Turn</button>
                 <div id="rsr"/>
             </React.Fragment>
         );

@@ -129,8 +129,9 @@ class MapComponent extends Component {
             let x = (bbox.x + bbox.width / 2), y = (bbox.y + bbox.height / 2);
 
             let terrID = this.getRegionId(region);
+            let textContent = "armyCount";
 
-            allTerrsText[terrID] = window.rsr.text(x, y, terrID);
+            allTerrsText[terrID] = window.rsr.text(x, y, textContent);
         }
     };
 
@@ -141,9 +142,10 @@ class MapComponent extends Component {
     /*
     Retrieve current army count associated to territory from input ID
      */
-    getArmyCountFromId = (id) => {
-        axios.get('/' + this.getGameId()).then(res => {
-            const data = res.data;
+    getArmyCountFromId = terrID => {
+        axios.get('/' + this.getGameId() + '/' + terrID).then(res => {
+            const terrData = res.data;
+            // let armyCount = terrData.armies;
         });
     };
 

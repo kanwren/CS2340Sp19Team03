@@ -83,22 +83,22 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     }
   }
 
-  def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      ???
-    }
-  }
+//  def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+//    onGame(gameId) { game: Game =>
+//      ???
+//    }
+//  }
 
-  def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    implicit val territoryData: Writes[Territory] = (
-      (JsPath \ "name").write[String] and
-      (JsPath \ "parent").write[String] and
-      (JsPath \ "armies").write[Int]
-    )(unlift(Territory.unapply))
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.board.territories(territoryId))
-      Ok(json)
-    }
-  }
+//  def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+//    implicit val territoryData: Writes[Territory] = (
+//      (JsPath \ "name").write[String] and
+//      (JsPath \ "parent").write[String] and
+//      (JsPath \ "armies").write[Int]
+//    )(unlift(Territory.unapply))
+//    onGame(gameId) { game: Game =>
+//      val json: JsValue = Json.toJson(game.board.territories(territoryId))
+//      Ok(json)
+//    }
+//  }
 
 }

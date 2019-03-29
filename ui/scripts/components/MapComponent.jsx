@@ -75,8 +75,9 @@ class MapComponent extends Component {
 
     setMouseOver = (region, isLinked) => {
         if (isLinked) {
-            for (let i = 0; i < region.length; i++)
+            for (let i = 0; i < region.length; i++) {
                 region[i].node.style.opacity = HIGHLIGHT_OPACITY;
+            }
         } else {
             region.node.style.opacity = HIGHLIGHT_OPACITY;
         }
@@ -84,8 +85,9 @@ class MapComponent extends Component {
 
     setMouseOut = (region, isLinked) => {
         if (isLinked) {
-            for (let i = 0; i < region.length; i++)
+            for (let i = 0; i < region.length; i++) {
                 region[i].node.style.opacity = UNHIGHLIGHT_OPACITY;
+            }
         } else {
             region.node.style.opacity = UNHIGHLIGHT_OPACITY;
         }
@@ -93,10 +95,13 @@ class MapComponent extends Component {
 
     setMouseDown = (region, isLinked) => {
         let id = undefined;
-        if (isLinked) id = region[0].data('id');
-        else id = region.data('id');
+        if (isLinked) {
+            id = region[0].data('id');
+        } else {
+            id = region.data('id');
+        }
 
-        if (this.state.armiesLeftToAssign > 0) {
+        if (this.state.armiesLeftToAssign > 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)) {
             const newTerrDatas = this.state.terrDatas.slice();
             newTerrDatas[id].armies += 1;
 
@@ -110,7 +115,7 @@ class MapComponent extends Component {
                 axios.get("").then(() => {
                     this.incrementTerritoryArmyCount(id, 1, () => {
                     });
-                })
+                });
             });
         }
     };
@@ -142,8 +147,11 @@ class MapComponent extends Component {
     }
 
     getRegionId = region => {
-        if (window.linkedRegions.indexOf(region) !== -1) return region[0].data('id');
-        else return region.data('id');
+        if (window.linkedRegions.indexOf(region) !== -1) {
+            return region[0].data('id');
+        } else {
+            return region.data('id');
+        }
     };
 
     setupTerritoriesText = () => {
@@ -165,14 +173,14 @@ class MapComponent extends Component {
     /*
     AJAX call to retrieve current army count associated to territory from input ID
      */
-    updateArmyCountById = (terrID, callback) => {
+    updateTerritoryById = (terrID, callback) => {
         axios.get('/territoryInfo/' + terrID + '/' + this.getGameId()).then(res => {
             const newTerrDatas = this.state.terrDatas.slice();
-            newTerrDatas[terrID].armies += 1;
+            newTerrDatas[terrID] = res.data;
 
             this.setState({
                 terrDatas: newTerrDatas
-            }, callback)
+            }, callback);
         });
     };
 
@@ -203,7 +211,10 @@ class MapComponent extends Component {
     URL path.
      */
     getGameId() {
-        if (this.state.DOMLoaded) return window.location.pathname.substring(1);
+        if (this.state.DOMLoaded) {
+            return window.location.pathname.substring(1);
+        }
+
         return null;
     }
 
@@ -229,6 +240,8 @@ class MapComponent extends Component {
     render() {
         return (
             <React.Fragment>
+                <h1>{"Current Player: " + this.state.currPlayer}</h1>
+                <h3>{"Armies Left: " + this.state.armiesLeftToAssign}</h3>
                 <button onClick={() => this.handleEndTurn(this.updateGameState)}>End Turn</button>
                 <div id="rsr"/>
             </React.Fragment>

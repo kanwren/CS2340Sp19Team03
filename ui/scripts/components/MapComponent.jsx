@@ -101,11 +101,9 @@ class MapComponent extends Component {
             this.setTerritoryText(id, this.state.terrDatas[id].armies);
 
             // Send POST request
-
+            
         });
     };
-
-
 
     setupTerritoriesMouseAction() {
         for (let i in window.rsrGroups) {

@@ -117,4 +117,11 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     }
   }
 
+  def addArmiesToTerritory(gameId: String, territoryId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.board.territories(territoryId).armies += amount
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
 }

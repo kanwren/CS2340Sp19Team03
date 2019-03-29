@@ -1,7 +1,11 @@
 package models
 
 
-case class Player(name: String, var armies: Int, gameId: String, var numberOfTerritories: Int = 0) {
+case class Player(name: String,
+									var armies: Int,
+									gameId: String,
+									var numberOfTerritories: Int = 0,
+									var awardedArmies: Int = 0) {
 
   def awardArmies(): Unit = {
 		val thisGame: Game = GameManager.getGameById(gameId).get
@@ -9,6 +13,7 @@ case class Player(name: String, var armies: Int, gameId: String, var numberOfTer
 
 		def filledContinent(continent: String): Boolean =  {
 			val numberTerritoriesInContinent = ownedTerritories.count((t: Territory) => t.parent == continent)
+			awardedArmies = 0
 			continent match {
 				case "africa" => numberTerritoriesInContinent == 6
 				case "asia" => numberTerritoriesInContinent == 12
@@ -21,25 +26,26 @@ case class Player(name: String, var armies: Int, gameId: String, var numberOfTer
 		}
 
 		if(filledContinent("africa")) {
-			armies += 3
+			awardedArmies += 3
 		}
 		if(filledContinent("asia")) {
-			armies += 7
+			awardedArmies += 7
 		}
 		if(filledContinent("australia")) {
-			armies += 2
+			awardedArmies += 2
 		}
 		if(filledContinent("europe")) {
-			armies += 5
+			awardedArmies += 5
 		}
 		if(filledContinent("northamerica")) {
-			armies += 5
+			awardedArmies += 5
 		}
 		if(filledContinent("southamerica")) {
-			armies += 2
+			awardedArmies += 2
 		}
 
-		armies += (if (numberOfTerritories < 9) 3 else numberOfTerritories / 3)
+		awardedArmies += (if (numberOfTerritories < 9) 3 else numberOfTerritories / 3)
+		armies += awardedArmies
 
   }
 

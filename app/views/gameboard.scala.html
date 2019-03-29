@@ -7,13 +7,14 @@
         margin: 0 auto"></div>
     <table>
         <thead>
-            <tr><th>Turn Order</th><th>Player</th>
+            <tr><th>Turn Order</th><th>Player</th><th>Armies To Place</th>
+                <th>Territories Owned</th>
         </thead>
         <tbody>
         @for((p, i) <- game.players.zipWithIndex) {
             @* <tr><td>@(i + 1)</td><td>@names(i)</td><td>@playerMap(names(i))</td></tr> *@
             <tr><td>@(i + 1)</td>
-                <td>@p.name</td></tr>
+                <td style="text-align:right;">@p.name</td><td style="text-align:right;">@p.armies</td><td style="text-align:right;">@p.numberOfTerritories</td></tr>
         }
         </tbody>
     </table>

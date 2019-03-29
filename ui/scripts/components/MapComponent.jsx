@@ -101,6 +101,8 @@ class MapComponent extends Component {
         });
     };
 
+
+
     setupTerritoriesMouseAction() {
         for (let i in window.rsrGroups) {
             let region = window.rsrGroups[i];

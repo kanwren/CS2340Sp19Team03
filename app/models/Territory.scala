@@ -2,8 +2,8 @@ package models
 
 import play.api.libs.json._
 
-case class Territory(id: Int, name: String, parent: String, var armies: Int = 0) {
-  var owner: Option[Player] = Option(Player("default", 0, ""))
+
+case class Territory(id: Int, name: String, parent: String, var armies: Int = 0, var owner: Option[Player] = None) {
   def updateArmies: Unit = armies += 1
 }
 

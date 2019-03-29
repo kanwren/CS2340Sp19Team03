@@ -78,6 +78,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
   def endTurn(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
       game.turn += 1
+//      game.players(game.turn % game.players.size).awardArmies()
       Redirect(routes.GameController.showGame(gameId))
     }
   }
@@ -92,12 +93,14 @@ class GameController @Inject()(cc: MessagesControllerComponents)
   }
 
   def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val playerData: Writes[Player] = Json.writes[Player]
     implicit val territoryData: Writes[Territory] = (
       (JsPath \ "id").write[Int] and
-        (JsPath \ "name").write[String] and
-        (JsPath \ "parent").write[String] and
-        (JsPath \ "armies").write[Int]
-      ) (unlift(Territory.unapply))
+      (JsPath \ "name").write[String] and
+      (JsPath \ "parent").write[String] and
+      (JsPath \ "armies").write[Int] and
+      (JsPath \ "owner").write[Option[Player]]
+    ) (unlift(Territory.unapply))
     onGame(gameId) { game: Game =>
       val json: JsValue = Json.toJson(game.board.territories(territoryId))
       Ok(json)
@@ -105,15 +108,24 @@ class GameController @Inject()(cc: MessagesControllerComponents)
   }
 
   def getTerritoriesData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val playerData: Writes[Player] = Json.writes[Player]
     implicit val territoryData: Writes[Territory] = (
       (JsPath \ "id").write[Int] and
-        (JsPath \ "name").write[String] and
-        (JsPath \ "parent").write[String] and
-        (JsPath \ "armies").write[Int]
+      (JsPath \ "name").write[String] and
+      (JsPath \ "parent").write[String] and
+      (JsPath \ "armies").write[Int] and
+      (JsPath \ "owner").write[Option[Player]]
       ) (unlift(Territory.unapply))
     onGame(gameId) { game: Game =>
       val json: JsValue = Json.toJson(game.board.territories.values)
       Ok(json)
+    }
+  }
+
+  def addArmiesToTerritory(gameId: String, territoryId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.board.territories(territoryId).armies += amount
+      Redirect(routes.GameController.showGame(gameId))
     }
   }
 

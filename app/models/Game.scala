@@ -51,4 +51,4 @@ object Game {
   val idLength: Int = 4
 }
 
-case class GameInfo(turn: Int)
+case class GameInfo(turn: Int, players: Seq[Player])

@@ -83,9 +83,10 @@ class GameController @Inject()(cc: MessagesControllerComponents)
   }
 
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    implicit val playerData: Writes[Player] = Json.writes[Player]
     implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]
     onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(GameInfo(game.turn))
+      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players))
       Ok(json)
     }
   }

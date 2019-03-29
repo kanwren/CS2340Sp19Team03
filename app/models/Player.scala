@@ -1,7 +1,7 @@
 package models
 
-case class Player(name: String, var armies: Int, gameId: String) {
-  var numberOfTerritories: Int = 0
+
+case class Player(name: String, var armies: Int, gameId: String, var numberOfTerritories: Int = 0) {
   var northamerica: Int = 0
   var southamerica: Int = 0
   var europe: Int = 0

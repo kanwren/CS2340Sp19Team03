@@ -12,6 +12,8 @@ const ORIG_HEIGHT = 628;
 const ORIG_WIDTH = 1227;
 const MAP_TO_WIDTH_SCALE = 0.8;
 
+const INITIAL_ARMIES_TO_ASSIGN = 3.0;
+
 class MapComponent extends Component {
     constructor(props) {
         super(props);
@@ -57,6 +59,8 @@ class MapComponent extends Component {
             this.setupTerritoriesMouseAction();
             this.updateArmyCounts(() => {
                 this.setupTerritoriesText();
+                this.updateGameState(() => {
+                });
             });
         });
     }
@@ -92,17 +96,23 @@ class MapComponent extends Component {
         if (isLinked) id = region[0].data('id');
         else id = region.data('id');
 
-        const newTerrDatas = this.state.terrDatas.slice();
-        newTerrDatas[id].armies += 1;
+        if (this.state.armiesLeftToAssign > 0) {
+            const newTerrDatas = this.state.terrDatas.slice();
+            newTerrDatas[id].armies += 1;
 
-        this.setState({
-            terrDatas: newTerrDatas
-        }, () => {
-            this.setTerritoryText(id, this.state.terrDatas[id].armies);
+            this.setState({
+                terrDatas: newTerrDatas,
+                armiesLeftToAssign: this.state.armiesLeftToAssign - 1
+            }, () => {
+                this.setTerritoryText(id, this.state.terrDatas[id].armies);
 
-            // Send POST request
-            
-        });
+                // Send POST request
+                axios.get("").then(() => {
+                    this.incrementTerritoryArmyCount(id, 1, () => {
+                    });
+                })
+            });
+        }
     };
 
     setupTerritoriesMouseAction() {
@@ -182,7 +192,8 @@ class MapComponent extends Component {
             let gameInfo = res.data;
             this.setState({
                 currGameState: gameInfo,
-                currPlayer: gameInfo.players[gameInfo.turn % gameInfo.players.length].name
+                currPlayer: gameInfo.players[gameInfo.turn % gameInfo.players.length].name,
+                armiesLeftToAssign: INITIAL_ARMIES_TO_ASSIGN
             }, callback);
         });
     };
@@ -200,10 +211,19 @@ class MapComponent extends Component {
     REQUESTS TO CHANGE BACKEND DATA
     */
     handleEndTurn = callback => {
-        axios.get('/endTurn/' + this.getGameId()).then(() => callback(() => {
-            console.log(this.state.currPlayer);
-        }));
-        console.log("Turn ended!");
+        if (this.state.armiesLeftToAssign === 0) {
+            axios.get('/endTurn/' + this.getGameId()).then(() => callback(() => {
+                console.log("Current Player: " + this.state.currPlayer);
+            }));
+            console.log("Turn ended!");
+        } else {
+            console.log("Cannot end turn!");
+        }
+    };
+
+    incrementTerritoryArmyCount = (terrID, count, callback) => {
+        axios.get('/addArmiesToTerritory/' + count + '/' + terrID + '/' + this.getGameId())
+            .then(() => callback());
     };
 
     render() {

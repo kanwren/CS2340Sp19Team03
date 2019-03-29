@@ -5,6 +5,8 @@ import play.api.libs.json._
 class Territory(val id: Int, val name: String, val parent: String) {
   var armies: Int = 0
   var owner: Option[Player] = None
+
+  def updateArmies: Unit = armies += 1
 }
 
 object Territory {

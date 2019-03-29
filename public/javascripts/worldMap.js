@@ -533,7 +533,7 @@ europe.push(scandinavia, westerneurope, southerneurope, northerneurope, ukraine,
 greatbritain.push(path3930, path3932);
 
 var allTerrs = [brazil, peru, venezuela, argentina, westernaustralia, easternaustralia, newguinea, indonesia, southafrica, eastafrica, congo, egypt, northafrica, madagascar, centralamerica, westernunitedstates, easternunitedstates, quebec, ontario, alaska, alberta, northwestterritory, greenland, siam, china, middleeast, afghanistan, ural, mongolia, irkutsk, kamchatka, yakutsk, siberia, japan, india, scandinavia, westerneurope, southerneurope, northerneurope, ukraine, iceland, greatbritain];
-var linkedRegions = [indonesia, japan, newguinea, greatbritain, india, easternaustralia, argentina];
+const linkedRegions = [indonesia, japan, newguinea, greatbritain, india, easternaustralia, argentina];
 
 // var camBBox = centralamerica.getBBox();
 // var camText = rsr.text(camBBox.x + camBBox.width/3, camBBox.y + camBBox.height/3, centralamerica.get('id'));

@@ -31,4 +31,6 @@ Jeffrey Luo
 
 ## UML Class Diagram
 
-![Risk UML](risk_uml.png)
+<p align="center">
+  <img src="risk_uml.png" width="100%" title="">
+</p>

@@ -28,3 +28,9 @@ Justin Prindle\
 Rahul Bhethanabotla\
 Pranav Kommabathula\
 Jeffrey Luo
+
+## UML Class Diagram
+
+<p align="center">
+  <img src="risk_uml.png" width="100%" title="">
+</p>

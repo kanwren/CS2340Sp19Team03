@@ -3,22 +3,34 @@
 # ~~~~
 
 # Home page
-GET     /                                             controllers.GameController.index
-POST    /                                             controllers.GameController.joinGame
+GET     /                                                           controllers.GameController.index
+POST    /                                                           controllers.GameController.joinGame
 
-GET     /board                                        controllers.GameBoardController.boardTest()
+GET     /board                                                      controllers.GameBoardController.boardTest()
 
 # Trigger a game creation and redirect to showGame
-GET     /createGame                                   controllers.GameController.createGame
+GET     /createGame                                                 controllers.GameController.createGame
 
 # Trigger transfer to the Assignment state and redirect to showGame
-GET     /startAssignment/$gameId<[A-Za-z0-9]{4}>      controllers.GameController.startAssignment(gameId)
+GET     /startAssignment/$gameId<[A-Za-z0-9]{4}>                    controllers.GameController.startAssignment(gameId)
 
-GET     /startPlay/$gameId<[A-Za-z0-9]{4}>            controllers.GameController.startPlay(gameId)
+GET     /startPlay/$gameId<[A-Za-z0-9]{4}>                          controllers.GameController.startPlay(gameId)
 
 # Redirects to the appropriate route based on game state
-GET     /$gameId<[A-Za-z0-9]{4}>                controllers.GameController.showGame(gameId, playerName: Option[String] ?= None)
+GET     /$gameId<[A-Za-z0-9]{4}>                                    controllers.GameController.showGame(gameId, playerName: Option[String] ?= None)
 
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                                 controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file                                               controllers.Assets.versioned(path="/public", file: Asset)
+
+
+# Game Functionality
+GET     /endTurn/$gameId<[A-Za-z0-9]{4}>                            controllers.GameController.endTurn(gameId)
+GET     /addArmiesToTerritory/:amount/:territoryId/$gameId<[A-Za-z0-9]{4}> controllers.GameController.addArmiesToTerritory(gameId, territoryId: Int, amount: Int)
+
+# Game State endpoints
+GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                           controllers.GameStateController.getGameState(gameId)
+GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>                    controllers.GameStateController.getTerritoriesData(gameId)
+GET     /territoryInfo/:territoryId/$gameId<[A-Za-z0-9]{4}>         controllers.GameStateController.getTerritoryData(gameId, territoryId: Int)
+GET     /playerInfo/:playerOrder/$gameId<[A-Za-z0-9]{4}>            controllers.GameStateController.getPlayerData(gameId, playerOrder: Int)
+GET     /playersInfo/$gameId<[A-Za-z0-9]{4}>                        controllers.GameStateController.getPlayersData(gameId)

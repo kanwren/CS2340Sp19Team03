@@ -1,30 +1,26 @@
 # RISK Team 3
 
-A recreation of the strategy board game RISK. 
+A recreation of the strategy board game RISK.
 
-## Running
+## Building
 
-There is a two step compilation process, one for the frontend UI that
-bundles javascript written in React, and the other for the scala
-backend and templating framework. 
+There is a two step compilation process--one for the frontend UI that transpiles 
+and bundles React, and another for the Scala backend and its templating framework.
 
-Install node modules:
-```bash
-npm install
-```
+1. Verify that Node.js is installed. If not, visit [this site](https://nodejs.org/en/download/) and install the version for your platform
+2. Install node modules: `$ npm install`
+3. Bundle using Webpack from the project directory root: `$ npm run build`
 
-And start the UI compilation (in development mode) by typing:
-```bash
-npm run watch
-```
+## Testing
+1. Start the Scala server by typing: `$ sbt run`
+2. Visit [http://localhost:9000](http://localhost:9000)
 
-Then run the server by typing:
+## Playing
+To play the game, you need to open 3 different localhost tabs and input at least
+3 different player names. After refreshing the page, the game can then be started. 
 
-```bash
-sbt run
-```
-
-Then visit [http://localhost:9000/](http://localhost:9000/)
+## Developing
+1. Start Webpack bundling (in development mode) by typing: `$ npm run watch`
 
 ## Authors
 Ishan Arya\
@@ -32,3 +28,9 @@ Justin Prindle\
 Rahul Bhethanabotla\
 Pranav Kommabathula\
 Jeffrey Luo
+
+## UML Class Diagram
+
+<p align="center">
+  <img src="risk_uml.png" width="100%" title="">
+</p>

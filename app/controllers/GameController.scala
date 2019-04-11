@@ -7,6 +7,8 @@ import akka.stream.Materializer
 import javax.inject.Inject
 import models._
 import play.api.data._
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
 import play.api.mvc._
 
 class GameController @Inject()(cc: MessagesControllerComponents)
@@ -32,9 +34,9 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           Redirect(routes.GameController.index()).flashing("ERROR" -> s"Player with name $name already in queue")
         } else {
           game.addPlayerToLobby(name)
-//          val parameters: mutable.HashMap[String, Seq[String]] = mutable.HashMap()
-//          parameters += "playerName" -> List(name)
-//          Redirect(routes.GameController.showGame(joinRequest.id).absoluteURL(), parameters.toMap)
+          //          val parameters: mutable.HashMap[String, Seq[String]] = mutable.HashMap()
+          //          parameters += "playerName" -> List(name)
+          //          Redirect(routes.GameController.showGame(joinRequest.id).absoluteURL(), parameters.toMap)
           Redirect(routes.GameController.showGame(joinRequest.id, Some(name)))
         }
       }
@@ -70,6 +72,19 @@ class GameController @Inject()(cc: MessagesControllerComponents)
         case _ =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
       }
+    }
+  }
+
+  def endTurn(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.nextTurn()
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+  def addArmiesToTerritory(gameId: String, territoryId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.board.territories(territoryId).armies += amount
+      Redirect(routes.GameController.showGame(gameId))
     }
   }
 

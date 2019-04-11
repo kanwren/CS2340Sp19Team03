@@ -50,6 +50,11 @@ class Game(val gameId: String) {
 
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers
 
+}
+
+object Game {
+  val idLength: Int = 4
+
   def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): Unit = {
     var attackerArmiesLost = 0
     var defenderArmiesLost = 0
@@ -73,11 +78,7 @@ class Game(val gameId: String) {
     attackingTerritory.armies -= attackerArmiesLost
     defendingTerritory.armies -= defenderArmiesLost
   }
-
-}
-
-object Game {
-  val idLength: Int = 4
+  
 }
 
 case class GameInfo(turn: Int, players: Seq[Player])

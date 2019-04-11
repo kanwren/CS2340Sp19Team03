@@ -54,8 +54,8 @@ class Game(val gameId: String) {
     var attackerArmiesLost = 0
     var defenderArmiesLost = 0
 
-    var attackerNums = Seq.fill(attackerDice)(1 + scala.util.Random.nextInt((6)).sorted.reverse
-    var defenderNums = Seq.fill(defenderDice)(1 + scala.util.Random.nextInt((6)).sorted.reverse
+    var attackerNums = Seq.fill(attackerDice)(1 + scala.util.Random.nextInt(6)).sorted.reverse
+    var defenderNums = Seq.fill(defenderDice)(1 + scala.util.Random.nextInt(6)).sorted.reverse
 
     if (defenderNums(0)  >= attackerNums(0)) {
       attackerArmiesLost += 1

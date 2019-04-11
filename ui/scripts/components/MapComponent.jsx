@@ -24,7 +24,10 @@ class MapComponent extends Component {
             terrDatas: undefined,
             armiesLeftToAssign: undefined,
             currGameState: undefined,
-            currentPlayer: undefined
+            currentPlayer: undefined,
+            isAttackPhase: false,
+            attackingRegion: undefined,
+            attackedRegion: undefined
         }
     }
 
@@ -101,7 +104,25 @@ class MapComponent extends Component {
             id = region.data('id');
         }
 
-        if (this.state.armiesLeftToAssign > 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)) {
+        if (this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)
+            && this.state.attackingRegion === undefined) {
+            if (isLinked) {
+                this.setState({attackingRegion: this.state.terrDatas[region[0].data('id')].name});
+            } else {
+                this.setState({attackingRegion: this.state.terrDatas[region.data('id')].name});
+            }
+        }
+
+        if (this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer !== this.state.terrDatas[id].owner.name)
+            && this.state.attackingRegion !== undefined) {
+            if (isLinked) {
+                this.setState({attackedRegion: this.state.terrDatas[region[0].data('id')].name});
+            } else {
+                this.setState({attackedRegion: this.state.terrDatas[region.data('id')].name});
+            }
+        }
+
+        if (!this.state.isAttackPhase && this.state.armiesLeftToAssign > 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)) {
             const newTerrDatas = this.state.terrDatas.slice();
             newTerrDatas[id].armies += 1;
 
@@ -218,11 +239,23 @@ class MapComponent extends Component {
         return null;
     }
 
+    beginAttackPhase = () => {
+        if (this.state.armiesLeftToAssign === 0) {
+            this.setState({isAttackPhase: !this.state.isAttackPhase});
+        }
+    }
+
+
     /*
     REQUESTS TO CHANGE BACKEND DATA
     */
     handleEndTurn = callback => {
         if (this.state.armiesLeftToAssign === 0) {
+            this.setState({
+                attackedRegion: undefined,
+                attackingRegion: undefined,
+                isAttackPhase: false
+            });
             axios.get('/endTurn/' + this.getGameId()).then(() => callback(() => {
                 console.log("Current Player: " + this.state.currPlayer);
             }));
@@ -242,6 +275,10 @@ class MapComponent extends Component {
             <React.Fragment>
                 <h1>{"Current Player: " + this.state.currPlayer}</h1>
                 <h3>{"Armies Left: " + this.state.armiesLeftToAssign}</h3>
+                <h4>{"Currently the attack phase: " + this.state.isAttackPhase}</h4>
+                <h5>{"The attacking region is: " + this.state.attackingRegion}</h5>
+                <h5>{"The attacked region is: " + this.state.attackedRegion}</h5>
+                <button onClick={() => this.beginAttackPhase()}>Attack Phase</button>
                 <button onClick={() => this.handleEndTurn(this.updateGameState)}>End Turn</button>
                 <div id="rsr"/>
             </React.Fragment>

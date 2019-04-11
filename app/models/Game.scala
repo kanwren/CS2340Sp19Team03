@@ -50,6 +50,29 @@ class Game(val gameId: String) {
 
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers
 
+  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): Unit = {
+    var attackerArmiesLost = 0
+    var defenderArmiesLost = 0
+    var attackerNums = Seq.fill(attackerDice)(1 + scala.util.Random.nextInt((6 - 1) + 1)).sorted.reverse
+    var defenderNums = Seq.fill(defenderDice)(1 + scala.util.Random.nextInt((6 - 1) + 1)).sorted.reverse
+
+    if (defenderNums(0)  >= attackerNums(0)) {
+      attackerArmiesLost += 1
+    } else {
+      defenderArmiesLost += 1
+    }
+
+    if (attackerDice > 1 && defenderDice > 1) {
+      if (defenderNums(1)  >= attackerNums(1)) {
+        attackerArmiesLost += 1
+      } else {
+        defenderArmiesLost += 1
+      }
+    }
+    attackingTerritory.armies -= attackerArmiesLost
+    defendingTerritory.armies -= defenderArmiesLost
+  }
+
 }
 
 object Game {

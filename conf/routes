@@ -6,10 +6,10 @@
 GET     /                                                           controllers.GameController.index
 POST    /                                                           controllers.GameController.joinGame
 
-GET     /board                                                      controllers.GameBoardController.boardTest()
-
 # Trigger a game creation and redirect to showGame
 GET     /createGame                                                 controllers.GameController.createGame
+
+GET     /testGame/$players<[3-7]>                                   controllers.GameController.testGame(players: Int)
 
 # Trigger transfer to the Assignment state and redirect to showGame
 GET     /startAssignment/$gameId<[A-Za-z0-9]{4}>                    controllers.GameController.startAssignment(gameId)
@@ -27,10 +27,12 @@ GET     /assets/*file                                               controllers.
 # Game Functionality
 GET     /endTurn/$gameId<[A-Za-z0-9]{4}>                            controllers.GameController.endTurn(gameId)
 GET     /addArmiesToTerritory/:amount/:territoryId/$gameId<[A-Za-z0-9]{4}> controllers.GameController.addArmiesToTerritory(gameId, territoryId: Int, amount: Int)
+GET     /simulateDiceRolls/:dice1/:dice2/:source/:target/$gameId<[A-Za-z0-9]{4}>    controllers.GameStateController.simulateDiceRoll(dice1: Int, dice2: Int, source: Int, target: Int, gameId)
 
 # Game State endpoints
 GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                           controllers.GameStateController.getGameState(gameId)
 GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>                    controllers.GameStateController.getTerritoriesData(gameId)
 GET     /territoryInfo/:territoryId/$gameId<[A-Za-z0-9]{4}>         controllers.GameStateController.getTerritoryData(gameId, territoryId: Int)
+GET     /territoryAdjacencies/:territoryId/$gameId<[A-Za-z0-9]{4}>  controllers.GameStateController.getTerritoryAdjacencies(gameId, territoryId: Int)
 GET     /playerInfo/:playerOrder/$gameId<[A-Za-z0-9]{4}>            controllers.GameStateController.getPlayerData(gameId, playerOrder: Int)
 GET     /playersInfo/$gameId<[A-Za-z0-9]{4}>                        controllers.GameStateController.getPlayersData(gameId)

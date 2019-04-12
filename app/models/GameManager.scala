@@ -9,10 +9,11 @@ object GameManager {
 
   def getGameById(gameId: String): Option[Game] = games get gameId
 
-  def makeNewGame: String = {
+  def makeNewGame: Game = {
     val id = generateId
-    games += (id -> new Game(id))
-    id
+    val game = new Game(id)
+    games += (id -> game)
+    game
   }
 
   @tailrec

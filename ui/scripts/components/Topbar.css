@@ -1,0 +1,17 @@
+table {
+    font-family: Verdana, sans-serif;
+    margin: 0 auto;
+    width: 75%;
+}
+
+td {
+    text-align: center;
+}
+
+.label {
+    border-radius: 5px;
+}
+
+.selected {
+    border: 3px dotted black;
+}

@@ -1,0 +1,28 @@
+.containerDiv {
+    background-color: #DDDDDD;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    font-family: Verdana, sans-serif;
+}
+
+.headerDiv {
+    background-color: #BBBBBB;
+    height: 10%;
+    border-radius: 5px;
+    margin: 0px 0 10px 0;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.validTerritoryStyle {
+    background-color: lightgreen;
+}
+
+.dice-select {
+    width: 50%;
+}

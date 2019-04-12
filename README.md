@@ -4,7 +4,7 @@ A recreation of the strategy board game RISK.
 
 ## Building
 
-There is a two step compilation process--one for the frontend UI that transpiles 
+There is a two step compilation process—one for the frontend UI that transpiles
 and bundles React, and another for the Scala backend and its templating framework.
 
 1. Verify that Node.js is installed. If not, visit [this site](https://nodejs.org/en/download/) and install the version for your platform
@@ -17,7 +17,7 @@ and bundles React, and another for the Scala backend and its templating framewor
 
 ## Playing
 To play the game, you need to open 3 different localhost tabs and input at least
-3 different player names. After refreshing the page, the game can then be started. 
+3 different player names. After refreshing the page, the game can then be started.
 
 ## Developing
 1. Start Webpack bundling (in development mode) by typing: `$ npm run watch`
@@ -29,8 +29,12 @@ Rahul Bhethanabotla\
 Pranav Kommabathula\
 Jeffrey Luo
 
-## UML Class Diagram
+## UML Class and Object Diagrams
 
 <p align="center">
-  <img src="risk_uml.png" width="100%" title="">
+  <img src="plans/risk_uml_1.png" width="100%" title="">
+</p>
+
+<p align="center">
+  <img src="plans/risk_uml_2.png" width="100%" title="">
 </p>

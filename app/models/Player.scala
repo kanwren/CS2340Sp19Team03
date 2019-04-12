@@ -7,19 +7,19 @@ case class Player(name: String,
                   var awardedArmies: Int = 0) {
 
   def awardArmies(board: Board): Unit = {
-    // Refactor into separate functions; `this` is a code smell
-    val ownedTerritories = board.territories.values.filter((t: Territory) => t.owner.contains(this))
+    // Refactor; `this` is a code smell
+    val ownedTerritories = board.territoriesOwnedBy(this)
     awardedArmies = 0
 
-    for ((continent, armiesReward) <- Territory.continentRewards) {
-      val ownedInContinent = ownedTerritories.count(_.parent == continent)
-      if (ownedInContinent == Territory.territoriesInContinent(continent)) {
-        awardedArmies += armiesReward
-      }
-    }
+    val baseReward: Int = if (numberOfTerritories < 9) 3 else numberOfTerritories / 3
 
-    awardedArmies += (if (numberOfTerritories < 9) 3 else numberOfTerritories / 3)
-    armies += awardedArmies
+    val extraAward: Int = Territory.continentRewards.map { case (continent, armiesReward) =>
+      val ownedInContinent = ownedTerritories.count(_.parent == continent)
+      val required = Territory.territoriesInContinent(continent)
+      if (ownedInContinent == required) armiesReward else 0
+    }.sum
+
+    armies += baseReward + extraAward
   }
 
   override def toString: String = name

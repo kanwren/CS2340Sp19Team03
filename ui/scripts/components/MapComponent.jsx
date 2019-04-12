@@ -17,6 +17,8 @@ const MAP_TO_WIDTH_SCALE = 0.6;
 
 const INITIAL_ARMIES_TO_ASSIGN = 3.0;
 
+const PHASES = ["ASSIGN", "ATTACK"]; // Eventually add 'FORTIFY' phase
+
 class MapComponent extends Component {
     constructor(props) {
         super(props);
@@ -32,6 +34,7 @@ class MapComponent extends Component {
             isAttackPhase: false,
             attackingRegion: undefined,
             attackedRegion: undefined,
+            phaseIndex: 0
         }
     }
 
@@ -83,6 +86,12 @@ class MapComponent extends Component {
     }
 
     setMouseOver = (region, isLinked) => {
+        let id = this.getRegionId(region);
+
+        this.setState({
+            selectedTerritory: this.state.terrDatas[id]
+        });
+
         if (isLinked) {
             for (let i = 0; i < region.length; i++) {
                 region[i].node.style.opacity = HIGHLIGHT_OPACITY;
@@ -93,6 +102,12 @@ class MapComponent extends Component {
     };
 
     setMouseOut = (region, isLinked) => {
+        let id = this.getRegionId(region);
+
+        this.setState({
+            selectedTerritory: undefined
+        });
+
         if (isLinked) {
             for (let i = 0; i < region.length; i++) {
                 region[i].node.style.opacity = UNHIGHLIGHT_OPACITY;
@@ -103,30 +118,16 @@ class MapComponent extends Component {
     };
 
     setMouseDown = (region, isLinked) => {
-        let id = undefined;
-        if (isLinked) id = region[0].data('id');
-        else id = region.data('id');
-
-        this.setState({
-            selectedTerritory: this.state.terrDatas[id]
-        });
+        let id = this.getRegionId(region);
 
         if (this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)
             && this.state.attackingRegion === undefined) {
-            if (isLinked) {
-                this.setState({attackingRegion: this.state.terrDatas[region[0].data('id')].name});
-            } else {
-                this.setState({attackingRegion: this.state.terrDatas[region.data('id')].name});
-            }
+            this.setState({attackingRegion: this.state.terrDatas[id].name});
         }
 
         if (this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer !== this.state.terrDatas[id].owner.name)
             && this.state.attackingRegion !== undefined) {
-            if (isLinked) {
-                this.setState({attackedRegion: this.state.terrDatas[region[0].data('id')].name});
-            } else {
-                this.setState({attackedRegion: this.state.terrDatas[region.data('id')].name});
-            }
+            this.setState({attackedRegion: this.state.terrDatas[id].name});
         }
 
         if (!this.state.isAttackPhase && this.state.armiesLeftToAssign > 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)) {
@@ -248,10 +249,12 @@ class MapComponent extends Component {
 
     beginAttackPhase = () => {
         if (this.state.armiesLeftToAssign === 0) {
-            this.setState({isAttackPhase: !this.state.isAttackPhase});
+            this.setState({
+                isAttackPhase: !this.state.isAttackPhase,
+                phaseIndex: 1
+            });
         }
-    }
-
+    };
 
     /*
     REQUESTS TO CHANGE BACKEND DATA
@@ -261,7 +264,8 @@ class MapComponent extends Component {
             this.setState({
                 attackedRegion: undefined,
                 attackingRegion: undefined,
-                isAttackPhase: false
+                isAttackPhase: false,
+                phaseIndex: 0
             });
 
             axios.get('/endTurn/' + this.getGameId()).then(() => {
@@ -284,13 +288,6 @@ class MapComponent extends Component {
     render() {
         return (
             <React.Fragment>
-                <h1>{"Current Player: " + this.state.currPlayer}</h1>
-                <h3>{"Armies Left: " + this.state.armiesLeftToAssign}</h3>
-                <h4>{"Currently the attack phase: " + this.state.isAttackPhase}</h4>
-                <h5>{"The attacking region is: " + this.state.attackingRegion}</h5>
-                <h5>{"The attacked region is: " + this.state.attackedRegion}</h5>
-                <button onClick={() => this.beginAttackPhase()}>Attack Phase</button>
-
                 <div className="flex-box">
                     <div id="rsr"/>
                     <Sidebar
@@ -298,6 +295,11 @@ class MapComponent extends Component {
                         currPlayer={this.state.currPlayer}
                         selectedTerritory={this.state.selectedTerritory}
                         handleEndTurn={this.handleEndTurn}
+                        handleBeginAttackPhase={this.beginAttackPhase}
+                        isAttackPhase={this.state.isAttackPhase}
+                        attackingRegion={this.state.attackingRegion}
+                        attackedRegion={this.state.attackedRegion}
+                        currPhase={PHASES[this.state.phaseIndex]}
                     />
                 </div>
             </React.Fragment>

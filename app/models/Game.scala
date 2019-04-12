@@ -50,33 +50,25 @@ class Game(val gameId: String) {
 
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers
 
-  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): Unit = {
-    var attackerArmiesLost = 0
-    var defenderArmiesLost = 0
-    var attackerNums = Seq.fill(attackerDice)(1 + scala.util.Random.nextInt((6 - 1) + 1)).sorted.reverse
-    var defenderNums = Seq.fill(defenderDice)(1 + scala.util.Random.nextInt((6 - 1) + 1)).sorted.reverse
-
-    if (defenderNums(0)  >= attackerNums(0)) {
-      attackerArmiesLost += 1
-    } else {
-      defenderArmiesLost += 1
-    }
-
-    if (attackerDice > 1 && defenderDice > 1) {
-      if (defenderNums(1)  >= attackerNums(1)) {
-        attackerArmiesLost += 1
-      } else {
-        defenderArmiesLost += 1
-      }
-    }
-    attackingTerritory.armies -= attackerArmiesLost
-    defendingTerritory.armies -= defenderArmiesLost
-  }
-
 }
 
 object Game {
   val idLength: Int = 4
+
+  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): Unit = {
+    val (attackerLost, defenderLost) =
+      rollDice(attackerDice).zip(rollDice(defenderDice))
+        .take(2)
+        .map { case (a, b) => if (b >= a) (1, 0) else (0, 1) }
+        .foldLeft((0, 0)) { case ((a1, a2), (b1, b2)) => (a1 + b1, a2 + b2) }
+
+    attackingTerritory.armies -= attackerLost
+    defendingTerritory.armies -= defenderLost
+  }
+
+  def rollDice(dice: Int): Seq[Int] =
+    Seq.fill(dice)(1 + Random.nextInt(6)).sorted(Ordering[Int].reverse)
+
 }
 
 case class GameInfo(turn: Int, players: Seq[Player])

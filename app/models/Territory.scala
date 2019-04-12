@@ -11,8 +11,9 @@ object Territory {
   def adjacencies(id: Int): List[Int] = territoryData(id).adjacencies
 
   val territoryData: Map[Int, TerritoryInfo] = {
-    val contents = scala.io.Source.fromFile("conf/board.json").mkString
-    val json: JsValue = Json.parse(contents)
+    val contents = scala.io.Source.fromFile("conf/board.json")
+    val json: JsValue = Json.parse(contents.mkString)
+    contents.close()
     implicit val infoReads: Reads[TerritoryInfo] = Json.reads[TerritoryInfo]
     val result: List[TerritoryInfo] = json.as[List[TerritoryInfo]]
     result.zipWithIndex.map(_.swap)(collection.breakOut)

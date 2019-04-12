@@ -9,7 +9,7 @@ import play.api.mvc._
 /**
   * Controller handling all requests relating to querying and modifying the
   * current game state
-  * @param cc Implicitly injected message controller
+  * @param cc Implicitly injected messages controller
   */
 class GameStateController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with ControllerUtils {
 

@@ -7,12 +7,15 @@ const UNHIGHLIGHT_OPACITY = 1.0;
 const BORDER_COLOR = "#FFFFFF";
 const BORDER_WIDTH = 1.0;
 const allTerrsText = {};
+const COMMUNIST = "red";
 
 const ORIG_HEIGHT = 628;
 const ORIG_WIDTH = 1227;
 const MAP_TO_WIDTH_SCALE = 0.8;
 
 const INITIAL_ARMIES_TO_ASSIGN = 3.0;
+let playerMap = {};
+let colors = ['#51d0ff', '#ff5151', '#51ffa2', '#ffff51', '#af66ff', '#ff66cc', '#afafaf'];
 
 class MapComponent extends Component {
     constructor(props) {
@@ -56,12 +59,18 @@ class MapComponent extends Component {
 
     initializeMap() {
         this.setState({mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH}, () => {
-            this.setupTerritoriesMouseAction();
             this.updateArmyCounts(() => {
                 this.setupTerritoriesText();
                 this.updateGameState(() => {
+                    let players = this.state.currGameState.players;
+                    players.forEach((e, i) => {
+                        playerMap[e.name] = i;
+                    });
+                    this.setupTerritoriesMouseAction();
                 });
             });
+            
+
         });
     }
 
@@ -124,19 +133,25 @@ class MapComponent extends Component {
         for (let i in window.rsrGroups) {
             let region = window.rsrGroups[i];
 
-            if (window.linkedRegions.indexOf(region) !== -1) {
-                for (let j = 0; j < region.length; j++) {
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                let regionId = region[0].data('id');
+                let owner = this.state.terrDatas[regionId].owner.name;
+                for (let j = 0; j < region.length; j++) { 
                     region[j].node.style.strokeWidth = BORDER_WIDTH;
                     region[j].node.style.stroke = BORDER_COLOR;
+                    this.setRegionColor(region[j], colors[playerMap[owner]]);
                 }
                 region.mouseover(() => this.setMouseOver(region, true)
                 ).mouseout(() => this.setMouseOut(region, true)
                 ).mousedown(() => this.setMouseDown(region, true));
             } else {
                 for (let j = 0; j < region.length; j++) {
+                    let regionId = region[j].data('id');
+                    let owner = this.state.terrDatas[regionId].owner.name;
                     let terr = region[j];
                     terr.node.style.strokeWidth = BORDER_WIDTH;
                     terr.node.style.stroke = BORDER_COLOR;
+                    this.setRegionColor(terr, colors[playerMap[owner]]);
 
                     terr.mouseover(() => this.setMouseOver(terr, false)
                     ).mouseout(() => this.setMouseOut(terr, false)
@@ -152,6 +167,10 @@ class MapComponent extends Component {
         } else {
             return region.data('id');
         }
+    };
+
+    setRegionColor = (region, color) => {
+        region.attr('fill', color);
     };
 
     setupTerritoriesText = () => {

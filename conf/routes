@@ -11,6 +11,8 @@ GET     /board                                                      controllers.
 # Trigger a game creation and redirect to showGame
 GET     /createGame                                                 controllers.GameController.createGame
 
+GET     /testGame/$players<[3-7]>                                   controllers.GameController.testGame(players: Int)
+
 # Trigger transfer to the Assignment state and redirect to showGame
 GET     /startAssignment/$gameId<[A-Za-z0-9]{4}>                    controllers.GameController.startAssignment(gameId)
 

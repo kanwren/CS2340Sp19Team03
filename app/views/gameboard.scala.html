@@ -1,10 +1,11 @@
 @(game: Game)(implicit request: MessagesRequestHeader)
 @* @(playerMap: scala.collection.mutable.HashMap[String, Int], names: Seq[String]) *@
 @main("Board") {
-    <h1>RISK Board</h1>
+    <div style="text-align: center; font-family: Verdana, sans-serif; margin: 0 auto; padding: 0 auto">
+        <h1 style="margin: 0 auto">RISK</h1>
+    </div>
     <hr/>
-    <div style="width: 100%;
-        margin: 0 auto"></div>
+    <!--
     <table>
         <thead>
             <tr><th>Turn Order</th><th>Player</th><th>Armies to Place</th>
@@ -26,7 +27,7 @@
         }
     </div>
     </div>
+    -->
     <div id="react-view"></div>
-
     <script src="@routes.Assets.versioned("compiled/bundle.js")"></script>
 }

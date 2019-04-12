@@ -12,8 +12,8 @@ object Territory {
 
   val territoryData: Map[Int, TerritoryInfo] = {
     val contents = scala.io.Source.fromFile("conf/board.json")
-    contents.close()
     val json: JsValue = Json.parse(contents.mkString)
+    contents.close()
     implicit val infoReads: Reads[TerritoryInfo] = Json.reads[TerritoryInfo]
     val result: List[TerritoryInfo] = json.as[List[TerritoryInfo]]
     result.zipWithIndex.map(_.swap)(collection.breakOut)

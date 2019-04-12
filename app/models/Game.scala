@@ -66,8 +66,10 @@ object Game {
     defendingTerritory.armies -= defenderLost
   }
 
-  def rollDice(dice: Int): Seq[Int] =
-    Seq.fill(dice)(1 + Random.nextInt(6)).sorted(Ordering[Int].reverse)
+  def rollDice(dice: Int): Seq[Int] = {
+    val dieSize = 6
+    Seq.fill(dice)(1 + Random.nextInt(dieSize)).sorted(Ordering[Int].reverse)
+  }
 
 }
 

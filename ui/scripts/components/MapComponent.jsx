@@ -34,6 +34,7 @@ class MapComponent extends Component {
             isAttackPhase: false,
             attackingRegion: undefined,
             attackedRegion: undefined,
+            adjTerrs: undefined,
             phaseIndex: 0
         }
     }
@@ -117,17 +118,38 @@ class MapComponent extends Component {
         }
     };
 
+    territoryCanAttack = id => {
+        return this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)
+            && this.state.attackingRegion === undefined;
+    };
+
+    territoryCanBeAttacked = id => {
+        if (!this.state.isAttackPhase || this.state.armiesLeftToAssign > 0 || this.state.attackingRegion === undefined)
+            return false;
+
+        return (this.state.currPlayer !== this.state.terrDatas[id].owner.name) && (this.state.adjTerrs.indexOf(id) !== -1);
+    };
+
+    getAdjacentTerritoryIds = (terrID, callback) => {
+        axios.get('/territoryAdjacencies/' + terrID + '/' + this.getGameId()).then(res => {
+            this.setState({
+                adjTerrs: res.data
+            }, callback);
+        });
+    };
+
     setMouseDown = (region, isLinked) => {
         let id = this.getRegionId(region);
 
-        if (this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)
-            && this.state.attackingRegion === undefined) {
-            this.setState({attackingRegion: this.state.terrDatas[id].name});
+        if (this.territoryCanAttack(id)) {
+            this.setState({attackingRegion: this.state.terrDatas[id]});
         }
 
-        if (this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer !== this.state.terrDatas[id].owner.name)
-            && this.state.attackingRegion !== undefined) {
-            this.setState({attackedRegion: this.state.terrDatas[id].name});
+        if (this.state.attackingRegion !== undefined) {
+            this.getAdjacentTerritoryIds(this.state.attackingRegion.id, () => {
+                if (this.territoryCanBeAttacked(id))
+                    this.setState({attackedRegion: this.state.terrDatas[id]});
+            });
         }
 
         if (!this.state.isAttackPhase && this.state.armiesLeftToAssign > 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)) {

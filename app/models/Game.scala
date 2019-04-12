@@ -70,7 +70,6 @@ object Game {
     val dieSize = 6
     Seq.fill(dice)(1 + Random.nextInt(dieSize)).sorted(Ordering[Int].reverse)
   }
-
 }
 
 case class GameInfo(turn: Int, players: Seq[Player])

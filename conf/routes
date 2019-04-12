@@ -32,5 +32,6 @@ GET     /addArmiesToTerritory/:amount/:territoryId/$gameId<[A-Za-z0-9]{4}> contr
 GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                           controllers.GameStateController.getGameState(gameId)
 GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>                    controllers.GameStateController.getTerritoriesData(gameId)
 GET     /territoryInfo/:territoryId/$gameId<[A-Za-z0-9]{4}>         controllers.GameStateController.getTerritoryData(gameId, territoryId: Int)
+GET     /territoryAdjacencies/:territoryId/$gameId<[A-Za-z0-9]{4}>  controllers.GameStateController.getTerritoryAdjacencies(gameId, territoryId: Int)
 GET     /playerInfo/:playerOrder/$gameId<[A-Za-z0-9]{4}>            controllers.GameStateController.getPlayerData(gameId, playerOrder: Int)
 GET     /playersInfo/$gameId<[A-Za-z0-9]{4}>                        controllers.GameStateController.getPlayersData(gameId)

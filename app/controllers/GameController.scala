@@ -41,9 +41,6 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           Redirect(routes.GameController.index()).flashing("ERROR" -> s"Player with name $name already in queue")
         } else {
           game.addPlayerToLobby(name)
-          //          val parameters: mutable.HashMap[String, Seq[String]] = mutable.HashMap()
-          //          parameters += "playerName" -> List(name)
-          //          Redirect(routes.GameController.showGame(joinRequest.id).absoluteURL(), parameters.toMap)
           Redirect(routes.GameController.showGame(joinRequest.id, Some(name)))
         }
       }

@@ -188,7 +188,7 @@ class MapComponent extends Component {
 
                 if (this.state.terrDatas === undefined) return;
                 let owner = this.state.terrDatas[regionId].owner.name;
-                for (let j = 0; j < region.length; j++) { 
+                for (let j = 0; j < region.length; j++) {
                     region[j].node.style.strokeWidth = BORDER_WIDTH;
                     region[j].node.style.stroke = BORDER_COLOR;
                     this.setRegionColor(region[j], colors[playerMap[owner]]);

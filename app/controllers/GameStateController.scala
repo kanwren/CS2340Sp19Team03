@@ -1,7 +1,8 @@
 package controllers
 
 import javax.inject.Inject
-import models.{Game, GameInfo, Player, Territory}
+import models.Game.RollResults
+import models._
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc._
 
@@ -40,8 +41,20 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     }
   }
 
+  def simulateDiceRoll(attackerDice: Int, defenderDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int, gameId: String): Action[AnyContent] =
+    Action { implicit request: MessagesRequest[AnyContent] =>
+      onGame(gameId) { game: Game =>
+        val attackingTerritory = game.board.territories(attackingTerritoryId)
+        val defendingTerritory = game.board.territories(defendingTerritoryId)
+        val results: RollResults = Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
+        val json: JsValue = Json.toJson(results)
+        Ok(json)
+      }
+    }
+
   implicit val playerData: Writes[Player] = Json.writes[Player]
   implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]
   implicit val territoryData: Writes[Territory] = Json.writes[Territory]
+  implicit val rollResultsData: Writes[RollResults] = Json.writes[RollResults]
 
 }

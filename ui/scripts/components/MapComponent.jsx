@@ -307,6 +307,15 @@ class MapComponent extends Component {
             .then(() => callback());
     };
 
+    updateAttackerAndDefenderText = () => {
+        if (this.state.attackingRegion === undefined ||
+            this.state.attackedRegion === undefined) return;
+        let aId = this.state.attackingRegion.id, dId = this.state.attackedRegion.id;
+
+        this.setTerritoryText(aId, this.state.terrDatas[aId].armies);
+        this.setTerritoryText(dId, this.state.terrDatas[dId].armies);
+    };
+
     render() {
         return (
             <React.Fragment>
@@ -323,6 +332,7 @@ class MapComponent extends Component {
                         attackedRegion={this.state.attackedRegion}
                         currPhase={PHASES[this.state.phaseIndex]}
                         gameId={this.getGameId()}
+                        handleUpdateArmies={() => this.updateArmyCounts(this.updateAttackerAndDefenderText)}
                     />
                 </div>
             </React.Fragment>

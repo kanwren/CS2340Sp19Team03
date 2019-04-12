@@ -78,6 +78,24 @@ class Sidebar extends Component {
                 rollData: res.data
             });
         });
+
+        this.props.handleUpdateArmies();
+    };
+
+    getAttackerMaxRolls = () => {
+        if (this.props.attackingRegion === undefined) return;
+        let armyCount = this.props.attackingRegion.armies;
+
+        if (armyCount - 1 > 3) return 3;
+        else return armyCount - 1;
+    };
+
+    getDefenderMaxRolls = () => {
+        if (this.props.attackedRegion === undefined) return;
+        let armyCount = this.props.attackedRegion.armies;
+
+        if (armyCount > 2) return 2;
+        else return armyCount;
     };
 
     renderRollResults = () => {
@@ -105,12 +123,12 @@ class Sidebar extends Component {
                         <td>
                             <h3>Attacker: {this.getRegionName(this.props.attackingRegion)}</h3>
                             <Dropdown className="dice-select" value={this.state.selectDice1} onChange={this._onSelect1}
-                                      options={options}/> Dice
+                                      options={options.slice(0, this.getAttackerMaxRolls())}/> Dice
                         </td>
                         <td>
                             <h3>To Attack: {this.getRegionName(this.props.attackedRegion)}</h3>
                             <Dropdown className="dice-select" value={this.state.selectDice2} onChange={this._onSelect2}
-                                      options={options}/> Dice
+                                      options={options.slice(0, this.getDefenderMaxRolls())}/> Dice
                         </td>
                     </tr>
                     </tbody>

@@ -4,6 +4,9 @@ import models.{Game, GameManager}
 import play.api.mvc.Results._
 import play.api.mvc._
 
+/**
+  * A mixin containing common routing utilities for the app's controllers
+  */
 trait ControllerUtils {
 
   /**

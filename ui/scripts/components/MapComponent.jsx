@@ -2,15 +2,18 @@ import React, {Component} from 'react';
 import scriptLoader from 'react-async-script-loader';
 import axios from 'axios';
 
+import "./MapComponent.css";
+import Sidebar from "./Sidebar.jsx";
+
 const HIGHLIGHT_OPACITY = 0.5;
 const UNHIGHLIGHT_OPACITY = 1.0;
+
 const BORDER_COLOR = "#FFFFFF";
 const BORDER_WIDTH = 1.0;
 const allTerrsText = {};
 
-const ORIG_HEIGHT = 628;
-const ORIG_WIDTH = 1227;
-const MAP_TO_WIDTH_SCALE = 0.8;
+const ORIG_HEIGHT = 628, ORIG_WIDTH = 1227;
+const MAP_TO_WIDTH_SCALE = 0.6;
 
 const INITIAL_ARMIES_TO_ASSIGN = 3.0;
 
@@ -24,23 +27,19 @@ class MapComponent extends Component {
             terrDatas: undefined,
             armiesLeftToAssign: undefined,
             currGameState: undefined,
-            currentPlayer: undefined
+            currentPlayer: undefined,
+            selectedTerritory: undefined
         }
     }
 
     /* This must be here */
     componentDidUpdate() {
         if (!this.state.DOMLoaded) {
-            this.setState({
-                DOMLoaded: true
-            });
+            this.setState({DOMLoaded: true});
         }
 
         if (!this.state.mapInitialized) {
             this.initializeMap();
-            this.setState({
-                mapInitialized: true
-            });
         }
     }
 
@@ -55,13 +54,20 @@ class MapComponent extends Component {
     }
 
     initializeMap() {
-        this.setState({mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH}, () => {
+        this.setState({
+            mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH,
+            mapInitialized: true
+        }, () => {
             this.setupTerritoriesMouseAction();
             this.updateArmyCounts(() => {
                 this.setupTerritoriesText();
                 this.updateGameState(() => {
                 });
             });
+
+            let scale = this.state.mapScaleFactor;
+            window.rsr.setViewBox(0, 0, ORIG_WIDTH, ORIG_HEIGHT, true);
+            window.rsr.setSize(ORIG_WIDTH * scale, ORIG_HEIGHT * scale);
         });
     }
 
@@ -95,11 +101,12 @@ class MapComponent extends Component {
 
     setMouseDown = (region, isLinked) => {
         let id = undefined;
-        if (isLinked) {
-            id = region[0].data('id');
-        } else {
-            id = region.data('id');
-        }
+        if (isLinked) id = region[0].data('id');
+        else id = region.data('id');
+
+        this.setState({
+            selectedTerritory: this.state.terrDatas[id]
+        });
 
         if (this.state.armiesLeftToAssign > 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)) {
             const newTerrDatas = this.state.terrDatas.slice();
@@ -221,11 +228,13 @@ class MapComponent extends Component {
     /*
     REQUESTS TO CHANGE BACKEND DATA
     */
-    handleEndTurn = callback => {
+    handleEndTurn = () => {
         if (this.state.armiesLeftToAssign === 0) {
-            axios.get('/endTurn/' + this.getGameId()).then(() => callback(() => {
-                console.log("Current Player: " + this.state.currPlayer);
-            }));
+            axios.get('/endTurn/' + this.getGameId()).then(() => {
+                this.updateGameState(() => {
+                    console.log("Current Player: " + this.state.currPlayer);
+                });
+            });
             console.log("Turn ended!");
         } else {
             console.log("Cannot end turn!");
@@ -240,10 +249,15 @@ class MapComponent extends Component {
     render() {
         return (
             <React.Fragment>
-                <h1>{"Current Player: " + this.state.currPlayer}</h1>
-                <h3>{"Armies Left: " + this.state.armiesLeftToAssign}</h3>
-                <button onClick={() => this.handleEndTurn(this.updateGameState)}>End Turn</button>
-                <div id="rsr"/>
+                <div className="flex-box">
+                    <div id="rsr"/>
+                    <Sidebar
+                        armiesLeftToAssign={this.state.armiesLeftToAssign}
+                        currPlayer={this.state.currPlayer}
+                        selectedTerritory={this.state.selectedTerritory}
+                        handleEndTurn={this.handleEndTurn}
+                    />
+                </div>
             </React.Fragment>
         );
     }

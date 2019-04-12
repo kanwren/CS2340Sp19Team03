@@ -5,7 +5,7 @@ import play.api.libs.json._
 
 case class Territory(id: Int, name: String, parent: String, var armies: Int = 0, var owner: Option[Player] = None) {
 
-  def updateAfterAttack(lost: Int, enemy: Territory): Unit = {
+  def updateAfterBattle(lost: Int, enemy: Territory): Unit = {
     armies = (armies - lost) max 0
     if (armies == 0) {
       owner = enemy.owner

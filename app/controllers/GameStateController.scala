@@ -56,8 +56,8 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
 
         val results: BattleResults = Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
 
-        attackingTerritory.updateAfterAttack(results.attackerLost, defendingTerritory)
-        defendingTerritory.updateAfterAttack(results.defenderLost, attackingTerritory)
+        attackingTerritory.updateAfterBattle(results.attackerLost, defendingTerritory)
+        defendingTerritory.updateAfterBattle(results.defenderLost, attackingTerritory)
 
         val json: JsValue = Json.toJson(results)
         Ok(json)

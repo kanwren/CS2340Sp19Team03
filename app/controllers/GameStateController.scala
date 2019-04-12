@@ -27,6 +27,13 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     }
   }
 
+  def getTerritoryAdjacencies(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      val json: JsValue = Json.toJson(Territory.adjacencies(territoryId))
+      Ok(json)
+    }
+  }
+
   def getPlayerData(gameId: String, playerOrder: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
       val json: JsValue = Json.toJson(game.players(playerOrder))

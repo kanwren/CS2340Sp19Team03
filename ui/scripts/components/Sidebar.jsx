@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Dropdown from 'react-dropdown';
+import axios from 'axios';
 
 import 'react-dropdown/style.css'
 import "./Sidebar.css";
@@ -13,7 +14,8 @@ class Sidebar extends Component {
         super(props);
         this.state = {
             selectDice1: undefined,
-            selectDice2: undefined
+            selectDice2: undefined,
+            rollData: undefined
         }
     }
 
@@ -52,7 +54,7 @@ class Sidebar extends Component {
     };
 
     getRegionName = region => {
-        if (region === undefined) return;
+        if (region === undefined) return undefined;
         else return region.name;
     };
 
@@ -68,8 +70,28 @@ class Sidebar extends Component {
     };
 
     handleAttack = () => {
+        console.log(this.state.selectDice1);
         // AXIOS call w/ this.state.selectDice1 and this.state.selectDice2
-        // axios.get('/simulateDiceRolls/' + this.state.selectDice1 + '/' + this.state.selectDice2 + '/' +
+        axios.get('/simulateDiceRolls/' + this.state.selectDice1.value + '/' + this.state.selectDice2.value + '/' +
+            this.props.attackingRegion.id + '/' + this.props.attackedRegion.id + '/' + this.props.gameId).then(res => {
+            this.setState({
+                rollData: res.data
+            });
+        });
+    };
+
+    renderRollResults = () => {
+        if (this.state.rollData === undefined)
+            return;
+
+        return (
+            <React.Fragment>
+                <h3>Attacker: {this.state.rollData.attackerRolls}</h3>
+                <h3>Defender: {this.state.rollData.defenderRolls}</h3>
+                <h3>Attacker loses {this.state.rollData.attackerLost} armies</h3>
+                <h3>Defender loses {this.state.rollData.defenderLost} armies</h3>
+            </React.Fragment>
+        );
     };
 
     renderAttackView = () => {
@@ -82,15 +104,19 @@ class Sidebar extends Component {
                     <tr>
                         <td>
                             <h3>Attacker: {this.getRegionName(this.props.attackingRegion)}</h3>
-                            <Dropdown className="dice-select" value={this.state.selectDice1} onChange={this._onSelect1} options={options}/> Dice
+                            <Dropdown className="dice-select" value={this.state.selectDice1} onChange={this._onSelect1}
+                                      options={options}/> Dice
                         </td>
                         <td>
                             <h3>To Attack: {this.getRegionName(this.props.attackedRegion)}</h3>
-                            <Dropdown className="dice-select" value={this.state.selectDice2} onChange={this._onSelect2} options={options}/> Dice
+                            <Dropdown className="dice-select" value={this.state.selectDice2} onChange={this._onSelect2}
+                                      options={options}/> Dice
                         </td>
                     </tr>
                     </tbody>
                 </table>
+
+                {this.renderRollResults()}
                 <button onClick={this.handleAttack}>ATTACK</button>
             </div>
         );

@@ -322,6 +322,7 @@ class MapComponent extends Component {
                         attackingRegion={this.state.attackingRegion}
                         attackedRegion={this.state.attackedRegion}
                         currPhase={PHASES[this.state.phaseIndex]}
+                        gameId={this.getGameId()}
                     />
                 </div>
             </React.Fragment>

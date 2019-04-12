@@ -3,9 +3,7 @@ package models
 import play.api.libs.json._
 
 
-case class Territory(id: Int, name: String, parent: String, var armies: Int = 0, var owner: Option[Player] = None) {
-  def updateArmies: Unit = armies += 1
-}
+case class Territory(id: Int, name: String, parent: String, var armies: Int = 0, var owner: Option[Player] = None)
 
 object Territory {
   case class TerritoryInfo(name: String, parent: String, adjacencies: List[Int])
@@ -19,4 +17,22 @@ object Territory {
     val result: List[TerritoryInfo] = json.as[List[TerritoryInfo]]
     result.zipWithIndex.map(_.swap)(collection.breakOut)
   }
+
+  val territoriesInContinent: Map[String, Int] = Map(
+    "africa" -> 6,
+    "asia" -> 12,
+    "australia" -> 4,
+    "europe" -> 7,
+    "northamerica" -> 9,
+    "southamerica" -> 4
+  )
+
+  val continentRewards: Map[String, Int] = Map(
+    "africa" -> 3,
+    "asia" -> 7,
+    "australia" -> 2,
+    "europe" -> 5,
+    "northamerica" -> 5,
+    "southamerica" -> 2
+  )
 }

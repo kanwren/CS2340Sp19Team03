@@ -32,5 +32,9 @@ Jeffrey Luo
 ## UML Class Diagram
 
 <p align="center">
-  <img src="risk_uml.png" width="100%" title="">
+  <img src="risk_uml_1.png" width="100%" title="">
+</p>
+
+<p align="center">
+  <img src="risk_uml_2.png" width="100%" title="">
 </p>

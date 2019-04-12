@@ -6,8 +6,6 @@
 GET     /                                                           controllers.GameController.index
 POST    /                                                           controllers.GameController.joinGame
 
-GET     /board                                                      controllers.GameBoardController.boardTest()
-
 # Trigger a game creation and redirect to showGame
 GET     /createGame                                                 controllers.GameController.createGame
 

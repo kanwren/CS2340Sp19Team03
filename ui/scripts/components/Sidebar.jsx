@@ -5,7 +5,7 @@ import axios from 'axios';
 import 'react-dropdown/style.css'
 import "./Sidebar.css";
 
-const options = [
+const diceOptions = [
     1, 2, 3
 ];
 
@@ -19,32 +19,26 @@ class Sidebar extends Component {
         }
     }
 
-    _onSelect1 = option => {
+    attackerOnDiceSelect = option => {
         this.setState({
             selectDice1: option
         });
     };
 
-    _onSelect2 = option => {
+    defenderOnDiceSelect = option => {
         this.setState({
             selectDice2: option
         });
     };
 
-    getTerritoryName = () => {
+    getTerritoryProperty(property) {
         if (this.props.selectedTerritory === undefined) return;
-        return this.props.selectedTerritory.name;
-    };
 
-    getTerritoryOwner = () => {
-        if (this.props.selectedTerritory === undefined) return;
-        return this.props.selectedTerritory.owner.name;
-    };
-
-    getTerritoryArmies = () => {
-        if (this.props.selectedTerritory === undefined) return;
-        return this.props.selectedTerritory.armies;
-    };
+        if (property === 'owner')
+            return this.props.selectedTerritory.owner.name;
+        else
+            return this.props.selectedTerritory[property];
+    }
 
     getValidStyle = () => {
         if (this.props.selectedTerritory === undefined) return;
@@ -58,22 +52,10 @@ class Sidebar extends Component {
         else return region.name;
     };
 
-    renderAssignView = () => {
-        if (this.props.currPhase !== 'ASSIGN') return;
-
-        return (
-            <div className="headerDiv">
-                <h3>Armies Left: {this.props.armiesLeftToAssign}</h3>
-                <button onClick={this.props.handleBeginAttackPhase}>Start Attack Phase</button>
-            </div>
-        );
-    };
-
     handleAttack = () => {
-        console.log(this.state.selectDice1);
-        // AXIOS call w/ this.state.selectDice1 and this.state.selectDice2
-        axios.get('/simulateDiceRolls/' + this.state.selectDice1.value + '/' + this.state.selectDice2.value + '/' +
-            this.props.attackingRegion.id + '/' + this.props.attackedRegion.id + '/' + this.props.gameId).then(res => {
+        axios.get('/simulateDiceRolls/' + this.state.selectDice1.value + '/' +
+            this.state.selectDice2.value + '/' + this.props.attackingRegion.id + '/' +
+            this.props.attackedRegion.id + '/' + this.props.gameId).then(res => {
             this.setState({
                 rollData: res.data
             });
@@ -81,6 +63,16 @@ class Sidebar extends Component {
 
         this.props.handleUpdateArmies();
     };
+
+
+    // handleReset = () =>  {
+    //     this.setState({
+    //         this.props.attackingRegion: undefined,
+    //         this.props.attackedRegion: undefined,
+    //         selectDice1: undefined,
+    //         selectDice2: undefined
+    //     }
+    // };
 
     getAttackerMaxRolls = () => {
         if (this.props.attackingRegion === undefined) return;
@@ -99,16 +91,26 @@ class Sidebar extends Component {
     };
 
     renderRollResults = () => {
-        if (this.state.rollData === undefined)
-            return;
+        if (this.state.rollData === undefined) return;
 
         return (
             <React.Fragment>
-                <h3>Attacker: {this.state.rollData.attackerRolls}</h3>
-                <h3>Defender: {this.state.rollData.defenderRolls}</h3>
+                <h3>Attacker: {this.state.rollData.attackerRolls.join('-')}</h3>
+                <h3>Defender: {this.state.rollData.defenderRolls.join('-')}</h3>
                 <h3>Attacker loses {this.state.rollData.attackerLost} armies</h3>
                 <h3>Defender loses {this.state.rollData.defenderLost} armies</h3>
             </React.Fragment>
+        );
+    };
+
+    renderAssignView = () => {
+        if (this.props.currPhase !== 'ASSIGN') return;
+
+        return (
+            <div className="headerDiv">
+                <h3>Armies Left: {this.props.armiesLeftToAssign}</h3>
+                <button onClick={this.props.handleBeginAttackPhase}>Start Attack Phase</button>
+            </div>
         );
     };
 
@@ -122,20 +124,22 @@ class Sidebar extends Component {
                     <tr>
                         <td>
                             <h3>Attacker: {this.getRegionName(this.props.attackingRegion)}</h3>
-                            <Dropdown className="dice-select" value={this.state.selectDice1} onChange={this._onSelect1}
-                                      options={options.slice(0, this.getAttackerMaxRolls())}/> Dice
+                            <Dropdown className="dice-select" value={this.state.selectDice1}
+                                      onChange={this.attackerOnDiceSelect}
+                                      options={diceOptions.slice(0, this.getAttackerMaxRolls())}/> Dice
                         </td>
                         <td>
                             <h3>To Attack: {this.getRegionName(this.props.attackedRegion)}</h3>
-                            <Dropdown className="dice-select" value={this.state.selectDice2} onChange={this._onSelect2}
-                                      options={options.slice(0, this.getDefenderMaxRolls())}/> Dice
+                            <Dropdown className="dice-select" value={this.state.selectDice2}
+                                      onChange={this.defenderOnDiceSelect}
+                                      options={diceOptions.slice(0, this.getDefenderMaxRolls())}/> Dice
                         </td>
                     </tr>
                     </tbody>
                 </table>
 
                 {this.renderRollResults()}
-                <button onClick={this.handleAttack}>ATTACK</button>
+                <button onClick={this.handleAttack}>Commence Attack</button>
             </div>
         );
     };
@@ -151,10 +155,10 @@ class Sidebar extends Component {
 
                 <div className={"headerDiv " + this.getValidStyle()}>
                     <p className="textCenter">SELECTED REGION</p>
-                    <h3 className="textCenter">{this.getTerritoryName()}</h3>
+                    <h3 className="textCenter">{this.getTerritoryProperty('name')}</h3>
                     <hr/>
-                    <h3>Owner: {this.getTerritoryOwner()}</h3>
-                    <h3>Armies: {this.getTerritoryArmies()}</h3>
+                    <h3>Owner: {this.getTerritoryProperty('owner')}</h3>
+                    <h3>Armies: {this.getTerritoryProperty('armies')}</h3>
                 </div>
 
                 {this.renderAssignView()}

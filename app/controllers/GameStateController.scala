@@ -57,7 +57,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing the IDs of all territories adjacent to a territory
     */
   def getTerritoryAdjacencies(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
+    onGame(gameId) { _ =>
       val json: JsValue = Json.toJson(Territory.adjacencies(territoryId))
       Ok(json)
     }
@@ -105,8 +105,8 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
 
         val results: BattleResults = Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
 
-        attackingTerritory.updateAfterAttack(results.attackerLost, defendingTerritory)
-        defendingTerritory.updateAfterAttack(results.defenderLost, attackingTerritory)
+        attackingTerritory.updateAfterBattle(results.attackerLost, defendingTerritory)
+        defendingTerritory.updateAfterBattle(results.defenderLost, attackingTerritory)
 
         val json: JsValue = Json.toJson(results)
         Ok(json)

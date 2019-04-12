@@ -29,7 +29,7 @@ Rahul Bhethanabotla\
 Pranav Kommabathula\
 Jeffrey Luo
 
-## UML Class Diagram
+## UML Class and Object Diagrams
 
 <p align="center">
   <img src="plans/risk_uml_1.png" width="100%" title="">

@@ -1,25 +1,26 @@
 import React, {Component} from 'react';
 import scriptLoader from 'react-async-script-loader';
 import axios from 'axios';
-
-import "./MapComponent.css";
+import Topbar from "./Topbar.jsx"
 import Sidebar from "./Sidebar.jsx";
 
+import "./MapComponent.css";
+
+// Territory highlight and border settings
 const HIGHLIGHT_OPACITY = 0.5;
 const UNHIGHLIGHT_OPACITY = 1.0;
-
 const BORDER_COLOR = "#FFFFFF";
 const BORDER_WIDTH = 1.0;
 const allTerrsText = {};
-const COMMUNIST = "red";
 
+// Initial game dimensions and scale
 const ORIG_HEIGHT = 628, ORIG_WIDTH = 1227;
-const MAP_TO_WIDTH_SCALE = 0.6;
+const MAP_TO_WIDTH_SCALE = 0.75;
 
+// Other logistical constants
 const INITIAL_ARMIES_TO_ASSIGN = 3.0;
-let playerMap = {};
-let colors = ['#51d0ff', '#ff5151', '#51ffa2', '#ffff51', '#af66ff', '#ff66cc', '#afafaf'];
-
+const playerMap = {};
+const colors = ['#51d0ff', '#ff5151', '#51ffa2', '#ffff51', '#af66ff', '#ff66cc', '#afafaf'];
 const PHASES = ["ASSIGN", "ATTACK"]; // Eventually add 'FORTIFY' phase
 
 class MapComponent extends Component {
@@ -127,15 +128,17 @@ class MapComponent extends Component {
     };
 
     territoryCanAttack = id => {
-        return this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 && (this.state.currPlayer === this.state.terrDatas[id].owner.name)
-            && this.state.attackingRegion === undefined;
+        return this.state.isAttackPhase && this.state.armiesLeftToAssign === 0 &&
+            (this.state.currPlayer === this.state.terrDatas[id].owner.name) &&
+            this.state.attackingRegion === undefined;
     };
 
     territoryCanBeAttacked = id => {
         if (!this.state.isAttackPhase || this.state.armiesLeftToAssign > 0 || this.state.attackingRegion === undefined)
             return false;
 
-        return (this.state.currPlayer !== this.state.terrDatas[id].owner.name) && (this.state.adjTerrs.indexOf(id) !== -1);
+        return (this.state.currPlayer !== this.state.terrDatas[id].owner.name) &&
+            (this.state.adjTerrs.indexOf(id) !== -1);
     };
 
     getAdjacentTerritoryIds = (terrID, callback) => {
@@ -188,7 +191,7 @@ class MapComponent extends Component {
 
                 if (this.state.terrDatas === undefined) return;
                 let owner = this.state.terrDatas[regionId].owner.name;
-                for (let j = 0; j < region.length; j++) { 
+                for (let j = 0; j < region.length; j++) {
                     region[j].node.style.strokeWidth = BORDER_WIDTH;
                     region[j].node.style.stroke = BORDER_COLOR;
                     this.setRegionColor(region[j], colors[playerMap[owner]]);
@@ -341,6 +344,7 @@ class MapComponent extends Component {
     render() {
         return (
             <React.Fragment>
+                <Topbar gameState={this.state.currGameState} terrColors={colors}/>
                 <div className="flex-box">
                     <div id="rsr"/>
                     <Sidebar

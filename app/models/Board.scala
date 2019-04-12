@@ -9,6 +9,9 @@ class Board {
     }
   }
 
+  def territoriesOwnedBy(player: Player): Iterable[Territory] =
+    territories.values.filter((t: Territory) => t.owner.contains(player))
+
   def setArmyCount(id: Int, armies: Int): Unit = {
     territories(id).armies = armies
   }

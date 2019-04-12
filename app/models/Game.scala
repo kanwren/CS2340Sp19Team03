@@ -55,9 +55,9 @@ class Game(val gameId: String) {
 object Game {
   val idLength: Int = 4
 
-  case class RollResults(attackerRolls: Seq[Int], defenderRolls: Seq[Int], attackerLost: Int, defenderLost: Int)
+  case class BattleResults(attackerRolls: Seq[Int], defenderRolls: Seq[Int], attackerLost: Int, defenderLost: Int)
 
-  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): RollResults = {
+  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): BattleResults = {
     val attackerRolls = rollDice(attackerDice)
     val defenderRolls = rollDice(defenderDice)
 
@@ -67,7 +67,7 @@ object Game {
         .map { case (a, b) => if (b >= a) (1, 0) else (0, 1) }
         .foldLeft((0, 0)) { case ((a1, a2), (b1, b2)) => (a1 + b1, a2 + b2) }
 
-    RollResults(attackerRolls, defenderRolls, attackerLost, defenderLost)
+    BattleResults(attackerRolls, defenderRolls, attackerLost, defenderLost)
   }
 
   def rollDice(dice: Int): Seq[Int] = {

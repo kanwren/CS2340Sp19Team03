@@ -82,6 +82,16 @@ class Sidebar extends Component {
         this.props.handleUpdateArmies();
     };
 
+
+    // handleReset = () =>  {
+    //     this.setState({
+    //         this.props.attackingRegion: undefined,
+    //         this.props.attackedRegion: undefined,
+    //         selectDice1: undefined,
+    //         selectDice2: undefined
+    //     }
+    // };
+
     getAttackerMaxRolls = () => {
         if (this.props.attackingRegion === undefined) return;
         let armyCount = this.props.attackingRegion.armies;
@@ -104,8 +114,8 @@ class Sidebar extends Component {
 
         return (
             <React.Fragment>
-                <h3>Attacker: {this.state.rollData.attackerRolls}</h3>
-                <h3>Defender: {this.state.rollData.defenderRolls}</h3>
+                <h3>Attacker: {this.state.rollData.attackerRolls.join('-')}</h3>
+                <h3>Defender: {this.state.rollData.defenderRolls.join('-')}</h3>
                 <h3>Attacker loses {this.state.rollData.attackerLost} armies</h3>
                 <h3>Defender loses {this.state.rollData.defenderLost} armies</h3>
             </React.Fragment>
@@ -135,7 +145,7 @@ class Sidebar extends Component {
                 </table>
 
                 {this.renderRollResults()}
-                <button onClick={this.handleAttack}>ATTACK</button>
+                <button onClick={this.handleAttack}>Commence Attack</button>
             </div>
         );
     };

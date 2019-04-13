@@ -9,8 +9,7 @@ import models._
 import play.api.data._
 import play.api.mvc._
 
-/**
-  * Controller that monitors and manages the pool of running games
+/** Controller that monitors and manages the pool of running games.
   * @param cc Implicitly injected messages controller
   * @param system Implicitly injected ActorSystem
   * @param mat Implicitly injected Materializer
@@ -18,8 +17,7 @@ import play.api.mvc._
 class GameController @Inject()(cc: MessagesControllerComponents)
                               (implicit system: ActorSystem, mat: Materializer) extends MessagesAbstractController(cc) with ControllerUtils {
 
-  /**
-    * Create and redirect to a test game with a given number of players.
+  /** Create and redirect to a test game with a given number of players.
     * @param players the number of players to add to the test game
     * @return a redirection to the new game's page
     */
@@ -32,16 +30,14 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     Redirect(routes.GameController.showGame(game.gameId, Some("A")))
   }
 
-  /**
-    * Loads the home page.
+  /** Loads the home page.
     * @return a response that load the home page
     */
   def index: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     Ok(views.html.index(JoinForm.form))
   }
 
-  /**
-    * Creates a new game with a random game ID.
+  /** Creates a new game with a random game ID.
     * @return a redirection to the home page with a message containing the game ID
     */
   def createGame: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -49,8 +45,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     Redirect(routes.GameController.index()).flashing("INFO" -> s"Your game ID is: ${game.gameId}")
   }
 
-  /**
-    * Reads form data to let a player join a game.
+  /** Reads form data to let a player join a game.
     * @return a redirection to the game's page, if found, otherwise a redirection to an error page
     */
   def joinGame: Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
@@ -71,8 +66,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     JoinForm.form.bindFromRequest.fold(errorFunction, successFunction)
   }
 
-  /**
-    * Trigger the territory assignment phase in a given game.
+  /** Trigger the territory assignment phase in a given game.
     * @param gameId the ID of the game to advance
     * @return a redirection to the game's page
     */
@@ -83,8 +77,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     }
   }
 
-  /**
-    * Trigger the beginning of gameplay in a given game.
+  /** Trigger the beginning of gameplay in a given game.
     * @param gameId the ID of the game to advance
     * @return a redirection to the game's page
     */
@@ -95,8 +88,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     }
   }
 
-  /**
-    * Display the game of a given page.
+  /** Display the game of a given page.
     * @param gameId the ID of the game to display
     * @param playerName the current player's name
     * @return a response with the game's page, depending on the state, or an error page if the state is invalid
@@ -118,8 +110,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     }
   }
 
-  /**
-    * Trigger the end of the current turn for a given game.
+  /** Trigger the end of the current turn for a given game.
     * @param gameId the ID of the game to advance
     * @return a redirection to the game's page
     */
@@ -130,8 +121,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     }
   }
 
-  /**
-    * Add a given number of armies to some territory in a game
+  /** Add a given number of armies to some territory in a game.
     * @param gameId the ID of the game being queried
     * @param territoryId the ID of the territory to add armies to
     * @param amount the amount of armies to add to the territory

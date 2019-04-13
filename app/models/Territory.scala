@@ -2,9 +2,19 @@ package models
 
 import play.api.libs.json._
 
-
+/** Data type representing a territory on the game's map.
+  * @param id the ID number of the territory
+  * @param name the display name of the territory
+  * @param parent the display name of the territory's continent
+  * @param armies the number of armies on this territory
+  * @param owner the owner, if one exists
+  */
 case class Territory(id: Int, name: String, parent: String, var armies: Int = 0, var owner: Option[Player] = None) {
 
+  /** After battle, update number of armies and owner according to armies lost.
+    * @param lost the number of armies lost in the battle
+    * @param enemy the territory that attacked the current territory
+    */
   def updateAfterBattle(lost: Int, enemy: Territory): Unit = {
     armies = (armies - lost) max 0
     if (armies == 0) {
@@ -14,9 +24,20 @@ case class Territory(id: Int, name: String, parent: String, var armies: Int = 0,
 
 }
 
+/** Utilities and static data related to preset territory information */
 object Territory {
+
+  /** The static information about a territory on the map.
+    * @param name the display name of the territory
+    * @param parent the display name of the territory's parent continent
+    * @param adjacencies the IDs of the territories adjacent to this territory
+    */
   case class TerritoryInfo(name: String, parent: String, adjacencies: List[Int])
 
+  /** Fetch the IDs of territories adjacent to a given territory.
+    * @param id the ID of the territory being queried
+    * @return a list of the IDs of the adjacent territories
+    */
   def adjacencies(id: Int): List[Int] = territoryData(id).adjacencies
 
   val territoryData: Map[Int, TerritoryInfo] = {

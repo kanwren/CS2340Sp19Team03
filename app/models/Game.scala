@@ -4,6 +4,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 /** Represents an instance of a game of Risk between players.
+  *
   * @param gameId the ID of this game
   */
 class Game(val gameId: String) {
@@ -14,11 +15,12 @@ class Game(val gameId: String) {
   var gameState: GameState = Lobbying
 
   /** Add player to lobby during assignment.
+    *
     * @param name the display name of the player to lobby
     */
   def addPlayerToLobby(name: String): Unit = lobbiedPlayers += name
 
-  /** Change the current game state to assigning */
+  /** Change the current game state to assigning and assign armies, territories, and turn order */
   def startAssignment(): Unit = {
     if (gameState == Lobbying) {
       gameState = Assigning
@@ -67,16 +69,18 @@ object Game {
   val idLength: Int = 4
 
   /** Data type representing the results of a battle.
+    *
     * @param attackerRolls the dice rolls of the attacker
     * @param defenderRolls the dice rolls of the defender
-    * @param attackerLost the number of armies lost in the attacking territory
-    * @param defenderLost the number of armies lost in the defending territory
+    * @param attackerLost  the number of armies lost in the attacking territory
+    * @param defenderLost  the number of armies lost in the defending territory
     */
   case class BattleResults(attackerRolls: Seq[Int], defenderRolls: Seq[Int], attackerLost: Int, defenderLost: Int)
 
   /** Randomly simulate and resolve battle.
-    * @param attackerDice the number of dice of the attacker
-    * @param defenderDice the number of dice of the defender
+    *
+    * @param attackerDice       the number of dice of the attacker
+    * @param defenderDice       the number of dice of the defender
     * @param attackingTerritory the attacking territory
     * @param defendingTerritory the defending territory
     * @return the dice rolls and armies lost of both the attacker and defender
@@ -95,6 +99,7 @@ object Game {
   }
 
   /** Simulate randomly rolling n dice.
+    *
     * @param dice the number of dice to roll
     * @return a list of die rolls
     */
@@ -105,7 +110,8 @@ object Game {
 }
 
 /** Data type representing the current state of the game
-  * @param turn the current position in the turn order
+  *
+  * @param turn    the current position in the turn order
   * @param players the players in the game
   */
 case class GameInfo(turn: Int, players: Seq[Player])

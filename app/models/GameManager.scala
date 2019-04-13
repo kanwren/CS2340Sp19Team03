@@ -4,18 +4,20 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.util.Random
 
-/** Utilities for creating and managing Game instances */
+/** Utilities for creating and managing `Game` instances */
 object GameManager {
   private val games: mutable.HashMap[String, Game] = mutable.HashMap[String, Game]()
 
   /** Fetch a game, if it exists.
+    *
     * @param gameId the ID of the game to fetch
-    * @return the game, if it exists, or an empty Optional otherwise
+    * @return the game, if it exists, or `None` otherwise
     */
   def getGameById(gameId: String): Option[Game] = games get gameId
 
-  /** Create and return a new Game instance.
-    * @return the new Game instance
+  /** Create and return a new `Game` instance.
+    *
+    * @return the new `Game` instance
     */
   def makeNewGame: Game = {
     val id = generateId
@@ -25,6 +27,7 @@ object GameManager {
   }
 
   /** Generate a new unique fixed-length alphanumeric game ID
+    *
     * @return the ID as a string
     */
   @tailrec

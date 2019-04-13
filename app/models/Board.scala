@@ -1,6 +1,6 @@
 package models
 
-import Territory.TerritoryInfo
+import models.Territory.TerritoryInfo
 
 /** Data type representing the map of a Risk game */
 class Board {
@@ -11,6 +11,7 @@ class Board {
   }
 
   /** Look up all territories owned by a player
+    *
     * @param player the player to query for
     * @return the territories that the player owns on the board
     */
@@ -18,7 +19,8 @@ class Board {
     territories.values.filter((t: Territory) => t.owner.contains(player))
 
   /** Mutator for the number of armies on a given territory
-    * @param id the ID of the territory to update
+    *
+    * @param id     the ID of the territory to update
     * @param armies the new number of armies in the territory
     */
   def setArmyCount(id: Int, armies: Int): Unit = {

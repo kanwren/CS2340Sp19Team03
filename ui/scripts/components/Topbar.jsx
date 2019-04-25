@@ -5,7 +5,7 @@ import './Topbar.css';
 class Topbar extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {};
     }
 
     getPlayerIndex = () => this.props.gameState.turn % this.props.gameState.players.length;

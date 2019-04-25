@@ -3,7 +3,7 @@ import Dropdown from 'react-dropdown';
 import axios from 'axios';
 
 import 'react-dropdown/style.css'
-import "./Sidebar.css";
+import './Sidebar.css';
 
 const diceOptions = [
     1, 2, 3
@@ -59,9 +59,8 @@ class Sidebar extends Component {
             this.setState({
                 rollData: res.data
             });
+            this.props.handleUpdateArmies();
         });
-
-        this.props.handleUpdateArmies();
     };
 
 
@@ -119,6 +118,8 @@ class Sidebar extends Component {
 
         return (
             <div className="headerDiv">
+                <p style={{textAlign: "center"}}>ATTACK</p>
+                <hr/>
                 <table>
                     <tbody>
                     <tr>
@@ -148,14 +149,15 @@ class Sidebar extends Component {
         return (
             <div className="containerDiv">
                 <div className="headerDiv">
-                    <p style={{textAlign: "center"}}>GAME INFO</p>
+                    <p style={{textAlign: "center", margin: "0 auto"}}>GAME INFO</p>
+                    <hr/>
                     <h3>PHASE: {this.props.currPhase}</h3>
                     <h3>TURN: {this.props.currPlayer}</h3>
                 </div>
 
                 <div className={"headerDiv " + this.getValidStyle()}>
-                    <p className="textCenter">SELECTED REGION</p>
-                    <h3 className="textCenter">{this.getTerritoryProperty('name')}</h3>
+                    <p style={{textAlign: "center", margin: "0 auto"}}>SELECTED REGION</p>
+                    <h3 style={{textAlign: "center"}}>{this.getTerritoryProperty('name')}</h3>
                     <hr/>
                     <h3>Owner: {this.getTerritoryProperty('owner')}</h3>
                     <h3>Armies: {this.getTerritoryProperty('armies')}</h3>

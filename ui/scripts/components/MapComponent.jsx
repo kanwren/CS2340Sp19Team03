@@ -11,6 +11,7 @@ const HIGHLIGHT_OPACITY = 0.5;
 const UNHIGHLIGHT_OPACITY = 1.0;
 const BORDER_COLOR = "#FFFFFF";
 const BORDER_WIDTH = 1.0;
+const ARMY_FONT_SIZE = 20;
 const allTerrsText = {};
 
 // Initial game dimensions and scale
@@ -237,7 +238,8 @@ class MapComponent extends Component {
 
             let terrID = this.getRegionId(region);
             this.updateArmyCounts(() => {
-                allTerrsText[terrID] = window.rsr.text(x, y, this.state.terrDatas[terrID].armies);
+                allTerrsText[terrID] = window.rsr.text(x, y, this.state.terrDatas[terrID].armies).
+                attr({"font-size": ARMY_FONT_SIZE});
             });
         }
     };

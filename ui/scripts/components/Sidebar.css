@@ -15,14 +15,10 @@
     margin: 0px 0 10px 0;
 }
 
-.textCenter {
-    text-align: center;
-}
-
 .validTerritoryStyle {
     background-color: lightgreen;
 }
 
 .dice-select {
-    width: 50%;
+    width: 80%;
 }

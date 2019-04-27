@@ -40,11 +40,12 @@ class Sidebar extends Component {
             return this.props.selectedTerritory[property];
     }
 
+    getPlayerIndex = () => this.props.gameState.turn % this.props.gameState.players.length;
+
     getValidStyle = () => {
         if (this.props.selectedTerritory === undefined) return;
-        if (this.props.currPlayer === this.props.selectedTerritory.owner.name) {
-            return "validTerritoryStyle";
-        }
+        if (this.props.currPlayer === this.props.selectedTerritory.owner.name)
+            return this.props.colors[this.getPlayerIndex()];
     };
 
     getRegionName = region => {
@@ -155,7 +156,7 @@ class Sidebar extends Component {
                     <h3>TURN: {this.props.currPlayer}</h3>
                 </div>
 
-                <div className={"headerDiv " + this.getValidStyle()}>
+                <div className="headerDiv" style={{backgroundColor: this.getValidStyle()}}>
                     <p style={{textAlign: "center", margin: "0 auto"}}>SELECTED REGION</p>
                     <h3 style={{textAlign: "center"}}>{this.getTerritoryProperty('name')}</h3>
                     <hr/>

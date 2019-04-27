@@ -21,7 +21,7 @@ const MAP_TO_WIDTH_SCALE = 0.75;
 // Other logistical constants
 const INITIAL_ARMIES_TO_ASSIGN = 3.0;
 const playerMap = {};
-const colors = ['#51d0ff', '#ff5151', '#51ffa2', '#ffff51', '#af66ff', '#ff66cc', '#afafaf'];
+const TERR_COLORS = ['#51d0ff', '#ff5151', '#51ffa2', '#ffff51', '#af66ff', '#ffa726', '#ff66cc'];
 const PHASES = ["ASSIGN", "ATTACK"]; // Eventually add 'FORTIFY' phase
 
 class MapComponent extends Component {
@@ -34,20 +34,24 @@ class MapComponent extends Component {
             terrDatas: undefined,
             armiesLeftToAssign: undefined,
             currGameState: undefined,
-            currentPlayer: undefined,
+            currPlayer: undefined,
             selectedTerritory: undefined,
             isAttackPhase: false,
             attackingRegion: undefined,
             attackedRegion: undefined,
             adjTerrs: undefined,
-            phaseIndex: 0
+            phaseIndex: 0,
+            fixedPlayer: undefined
         }
     }
 
     /* This must be here */
     componentDidUpdate() {
         if (!this.state.DOMLoaded) {
-            this.setState({DOMLoaded: true});
+            this.setState({
+                DOMLoaded: true,
+                fixedPlayer: this.getPlayerNameFromPath()
+            });
         }
 
         if (!this.state.mapInitialized) {
@@ -68,9 +72,8 @@ class MapComponent extends Component {
     initializeMap() {
         this.setState({
             mapScaleFactor: (window.innerWidth * MAP_TO_WIDTH_SCALE) / ORIG_WIDTH,
-            mapInitialized: true
+            mapInitialized: true,
         }, () => {
-            this.setupTerritoriesMouseAction();
             this.updateArmyCounts(() => {
                 this.setupTerritoriesText();
                 this.updateGameState(() => {
@@ -79,6 +82,7 @@ class MapComponent extends Component {
                         playerMap[e.name] = i;
                     });
                     this.setupTerritoriesMouseAction();
+                    this.updateTerritoryColors();
                 });
             });
 
@@ -143,7 +147,7 @@ class MapComponent extends Component {
     };
 
     getAdjacentTerritoryIds = (terrID, callback) => {
-        axios.get('/territoryAdjacencies/' + terrID + '/' + this.getGameId()).then(res => {
+        axios.get('/territoryAdjacencies/' + terrID + '/' + this.getGameIdFromPath()).then(res => {
             this.setState({
                 adjTerrs: res.data
             }, callback);
@@ -195,7 +199,7 @@ class MapComponent extends Component {
                 for (let j = 0; j < region.length; j++) {
                     region[j].node.style.strokeWidth = BORDER_WIDTH;
                     region[j].node.style.stroke = BORDER_COLOR;
-                    this.setRegionColor(region[j], colors[playerMap[owner]]);
+                    this.setRegionColor(region[j], TERR_COLORS[playerMap[owner]]);
                 }
                 region.mouseover(() => this.setMouseOver(region, true)
                 ).mouseout(() => this.setMouseOut(region, true)
@@ -209,11 +213,38 @@ class MapComponent extends Component {
                     let terr = region[j];
                     terr.node.style.strokeWidth = BORDER_WIDTH;
                     terr.node.style.stroke = BORDER_COLOR;
-                    this.setRegionColor(terr, colors[playerMap[owner]]);
+                    this.setRegionColor(terr, TERR_COLORS[playerMap[owner]]);
 
                     terr.mouseover(() => this.setMouseOver(terr, false)
                     ).mouseout(() => this.setMouseOut(terr, false)
                     ).mousedown(() => this.setMouseDown(terr, false));
+                }
+            }
+        }
+    }
+
+    setRegionColor = (region, color) => {
+        region.attr('fill', color);
+    };
+
+    updateTerritoryColors() {
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                let regionId = region[0].data('id');
+
+                if (this.state.terrDatas === undefined) return;
+                let owner = this.state.terrDatas[regionId].owner.name;
+                for (let j = 0; j < region.length; j++) {
+                    this.setRegionColor(region[j], TERR_COLORS[playerMap[owner]]);
+                }
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let regionId = region[j].data('id');
+                    if (this.state.terrDatas === undefined) return;
+                    let owner = this.state.terrDatas[regionId].owner.name;
+                    this.setRegionColor(region[j], TERR_COLORS[playerMap[owner]]);
                 }
             }
         }
@@ -225,10 +256,6 @@ class MapComponent extends Component {
         } else {
             return region.data('id');
         }
-    };
-
-    setRegionColor = (region, color) => {
-        region.attr('fill', color);
     };
 
     setupTerritoriesText = () => {
@@ -248,11 +275,8 @@ class MapComponent extends Component {
         allTerrsText[regionID].attr({text: stringContent});
     };
 
-    /*
-    AJAX call to retrieve current army count associated to territory from input ID
-     */
     updateTerritoryById = (terrID, callback) => {
-        axios.get('/territoryInfo/' + terrID + '/' + this.getGameId()).then(res => {
+        axios.get('/territoryInfo/' + terrID + '/' + this.getGameIdFromPath()).then(res => {
             const newTerrDatas = this.state.terrDatas.slice();
             newTerrDatas[terrID] = res.data;
 
@@ -262,11 +286,8 @@ class MapComponent extends Component {
         });
     };
 
-    /*
-    AJAX call to retrieve all territory army counts
-     */
     updateArmyCounts = callback => {
-        axios.get('/territoriesInfo/' + this.getGameId()).then(res => {
+        axios.get('/territoriesInfo/' + this.getGameIdFromPath()).then(res => {
             this.setState({
                 terrDatas: res.data.sort((a, b) => a.id - b.id)
             }, callback);
@@ -274,7 +295,7 @@ class MapComponent extends Component {
     };
 
     updateGameState = callback => {
-        axios.get('/gameInfo/' + this.getGameId()).then(res => {
+        axios.get('/gameInfo/' + this.getGameIdFromPath()).then(res => {
             let gameInfo = res.data;
             this.setState({
                 currGameState: gameInfo,
@@ -284,16 +305,14 @@ class MapComponent extends Component {
         });
     };
 
-    /*
-    Local method to fetch the current game ID from the
-    URL path.
-     */
-    getGameId() {
-        if (this.state.DOMLoaded) {
-            return window.location.pathname.substring(1);
-        }
+    getGameIdFromPath() {
+        return window.location.pathname.substring(1);
+    }
 
-        return null;
+    getPlayerNameFromPath() {
+        var location = window.location + ""; // String conversion
+
+        return location.split("playerName=")[1];
     }
 
     beginAttackPhase = () => {
@@ -317,7 +336,7 @@ class MapComponent extends Component {
                 phaseIndex: 0
             });
 
-            axios.get('/endTurn/' + this.getGameId()).then(() => {
+            axios.get('/endTurn/' + this.getGameIdFromPath()).then(() => {
                 this.updateGameState(() => {
                     console.log("Current Player: " + this.state.currPlayer);
                 });
@@ -330,23 +349,29 @@ class MapComponent extends Component {
     };
 
     incrementTerritoryArmyCount = (terrID, count, callback) => {
-        axios.get('/addArmiesToTerritory/' + count + '/' + terrID + '/' + this.getGameId())
+        axios.get('/addArmiesToTerritory/' + count + '/' + terrID + '/' + this.getGameIdFromPath())
             .then(() => callback());
     };
 
-    updateAttackerAndDefenderText = () => {
+    updateAttackerDefenderTextAndColors = () => {
         if (this.state.attackingRegion === undefined ||
             this.state.attackedRegion === undefined) return;
         let aId = this.state.attackingRegion.id, dId = this.state.attackedRegion.id;
 
         this.setTerritoryText(aId, this.state.terrDatas[aId].armies);
         this.setTerritoryText(dId, this.state.terrDatas[dId].armies);
+
+        this.updateTerritoryColors();
     };
 
     render() {
         return (
             <React.Fragment>
-                <Topbar gameState={this.state.currGameState} terrColors={colors}/>
+                <Topbar
+                    gameState={this.state.currGameState}
+                    terrColors={TERR_COLORS}
+                    fixedPlayer={this.state.fixedPlayer}
+                />
                 <div className="flex-box">
                     <div id="rsr"/>
                     <Sidebar
@@ -359,8 +384,10 @@ class MapComponent extends Component {
                         attackingRegion={this.state.attackingRegion}
                         attackedRegion={this.state.attackedRegion}
                         currPhase={PHASES[this.state.phaseIndex]}
-                        gameId={this.getGameId()}
-                        handleUpdateArmies={() => this.updateArmyCounts(this.updateAttackerAndDefenderText)}
+                        gameId={this.getGameIdFromPath()}
+                        handleUpdateArmies={() => this.updateArmyCounts(this.updateAttackerDefenderTextAndColors)}
+                        colors={TERR_COLORS}
+                        gameState={this.state.currGameState}
                     />
                 </div>
             </React.Fragment>

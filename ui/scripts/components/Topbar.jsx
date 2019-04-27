@@ -16,6 +16,14 @@ class Topbar extends Component {
         else return "label";
     };
 
+    getElementNameStyling = elName => {
+        console.log(elName);
+        console.log(this.props.fixedPlayer);
+        if (elName === this.props.fixedPlayer) return '>>> ' + elName + ' <<<';
+
+        return elName;
+    };
+
     renderNames() {
         if (this.props.gameState === undefined || this.props.gameState.players === undefined)
             return;
@@ -30,7 +38,7 @@ class Topbar extends Component {
                                 <div className={this.getLabelStyling(index)}
                                      style={{backgroundColor: this.props.terrColors[index]}}
                                 >
-                                    {el.name}
+                                    {this.getElementNameStyling(el.name)}
                                 </div>
                             </td>
                         );

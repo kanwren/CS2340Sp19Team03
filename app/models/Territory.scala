@@ -53,6 +53,8 @@ object Territory {
     result.zipWithIndex.map(_.swap)(collection.breakOut)
   }
 
+  val totalTerritories: Int = territoryData.keys.size
+
   val territoriesInContinent: Map[String, Int] = Map(
     "africa" -> 6,
     "asia" -> 12,

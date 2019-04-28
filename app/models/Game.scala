@@ -57,14 +57,17 @@ class Game(val gameId: String) {
 
   /** Advance the turn of the current game and award armies accordingly */
   def nextTurn(): Unit = {
-    turn += 1
-    players(turn % players.size).awardArmies(board)
+    turn = (turn + 1) % players.size
+    players(turn).awardArmies(board)
+    gameState = Assigning
   }
 
   /** Fetch the lobbied players for the current game */
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers
 
   def playerTurn(player: Player): Option[Int] = players.zipWithIndex.find(_._1 == player).map(_._2)
+
+  def playerWon(player: Player): Boolean = board.territoriesOwnedBy(player).size == Territory.totalTerritories
 
 }
 

@@ -210,9 +210,18 @@ class GameController @Inject()(cc: MessagesControllerComponents)
         case Defending(attackerDice, attackingTerritory, defendingTerritory) =>
           Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
 
-          game.activePlayer = game.playerTurn(attackingTerritory.owner.get).get
+          val attacker: Player = attackingTerritory.owner.get
 
-          game.gameState = if (defendingTerritory.armies == 0) Relocating else Attacking
+          game.activePlayer = game.playerTurn(attacker).get
+
+          game.gameState =
+            if (game.playerWon(attacker)) {
+              Finished(attacker)
+            } else if (defendingTerritory.armies == 0){
+              Relocating
+            } else{
+              Attacking
+            }
 
           Redirect(routes.GameController.showGame(gameId))
 

@@ -4,6 +4,8 @@ import axios from 'axios';
 import Topbar from "./Topbar.jsx"
 import Sidebar from "./Sidebar.jsx";
 
+import Tracer from "./Tracer.jsx";
+
 import "./MapComponent.css";
 
 // Territory highlight and border settings
@@ -22,7 +24,7 @@ const MAP_TO_WIDTH_SCALE = 0.75;
 const INITIAL_ARMIES_TO_ASSIGN = 3.0;
 const playerMap = {};
 const TERR_COLORS = ['#51d0ff', '#ff5151', '#51ffa2', '#ffff51', '#af66ff', '#ffa726', '#ff66cc'];
-const PHASES = ["ASSIGN", "ATTACK"]; // Eventually add 'FORTIFY' phase
+const PHASES = ["ASSIGN", "ATTACK", "FORTIFY"];
 
 class MapComponent extends Component {
     constructor(props) {
@@ -41,7 +43,8 @@ class MapComponent extends Component {
             attackedRegion: undefined,
             adjTerrs: undefined,
             phaseIndex: 0,
-            fixedPlayer: undefined
+            fixedPlayer: undefined,
+            tracer: new Tracer()
         }
     }
 
@@ -63,7 +66,13 @@ class MapComponent extends Component {
 
     componentDidMount() {
         window.addEventListener('resize', this.resize);
+
+        this.intervalId = setInterval(() => {
+            console.log("INTERVAL HERE");
+        }, 1000);
     }
+
+    //defenderConquered/ => boolean
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.resize);
@@ -265,8 +274,7 @@ class MapComponent extends Component {
 
             let terrID = this.getRegionId(region);
             this.updateArmyCounts(() => {
-                allTerrsText[terrID] = window.rsr.text(x, y, this.state.terrDatas[terrID].armies).
-                attr({"font-size": ARMY_FONT_SIZE});
+                allTerrsText[terrID] = window.rsr.text(x, y, this.state.terrDatas[terrID].armies).attr({"font-size": ARMY_FONT_SIZE});
             });
         }
     };
@@ -305,15 +313,15 @@ class MapComponent extends Component {
         });
     };
 
-    getGameIdFromPath() {
+    getGameIdFromPath = () => {
         return window.location.pathname.substring(1);
-    }
+    };
 
-    getPlayerNameFromPath() {
+    getPlayerNameFromPath = () => {
         var location = window.location + ""; // String conversion
 
         return location.split("playerName=")[1];
-    }
+    };
 
     beginAttackPhase = () => {
         if (this.state.armiesLeftToAssign === 0) {
@@ -321,6 +329,8 @@ class MapComponent extends Component {
                 isAttackPhase: !this.state.isAttackPhase,
                 phaseIndex: 1
             });
+
+            tracer.turnOnTracerLine();
         }
     };
 
@@ -360,7 +370,6 @@ class MapComponent extends Component {
 
         this.setTerritoryText(aId, this.state.terrDatas[aId].armies);
         this.setTerritoryText(dId, this.state.terrDatas[dId].armies);
-
         this.updateTerritoryColors();
     };
 

@@ -55,6 +55,18 @@ class Sidebar extends Component {
 
     handleAttack = () => {
         axios.get('/simulateDiceRolls/' + this.state.selectDice1.value + '/' +
+            this.props.attackingRegion.id + '/' + this.props.attackedRegion.id + '/' +
+            this.props.gameId).then(res => {
+            this.setState({
+                rollData: res.data
+            });
+            this.props.handleUpdateArmies();
+        });
+    };
+
+    /*
+    handleAttack = () => {
+        axios.get('/simulateDiceRolls/' + this.state.selectDice1.value + '/' +
             this.state.selectDice2.value + '/' + this.props.attackingRegion.id + '/' +
             this.props.attackedRegion.id + '/' + this.props.gameId).then(res => {
             this.setState({
@@ -63,7 +75,7 @@ class Sidebar extends Component {
             this.props.handleUpdateArmies();
         });
     };
-
+    */
 
     // handleReset = () =>  {
     //     this.setState({
@@ -108,6 +120,8 @@ class Sidebar extends Component {
 
         return (
             <div className="headerDiv">
+                <p style={{textAlign: "center"}}>ASSIGN</p>
+                <hr/>
                 <h3>Armies Left: {this.props.armiesLeftToAssign}</h3>
                 <button onClick={this.props.handleBeginAttackPhase}>Start Attack Phase</button>
             </div>
@@ -126,15 +140,13 @@ class Sidebar extends Component {
                     <tr>
                         <td>
                             <h3>Attacker: {this.getRegionName(this.props.attackingRegion)}</h3>
-                            <Dropdown className="dice-select" value={this.state.selectDice1}
-                                      onChange={this.attackerOnDiceSelect}
-                                      options={diceOptions.slice(0, this.getAttackerMaxRolls())}/> Dice
+                            <h3>To Attack: {this.getRegionName(this.props.attackedRegion)}</h3>
                         </td>
                         <td>
-                            <h3>To Attack: {this.getRegionName(this.props.attackedRegion)}</h3>
-                            <Dropdown className="dice-select" value={this.state.selectDice2}
-                                      onChange={this.defenderOnDiceSelect}
-                                      options={diceOptions.slice(0, this.getDefenderMaxRolls())}/> Dice
+                            <Dropdown className="dice-select"
+                                      value={this.state.selectDice1}
+                                      onChange={this.attackerOnDiceSelect}
+                                      options={diceOptions.slice(0, this.getAttackerMaxRolls())}/> Dice
                         </td>
                     </tr>
                     </tbody>
@@ -144,6 +156,43 @@ class Sidebar extends Component {
                 <button onClick={this.handleAttack}>Commence Attack</button>
             </div>
         );
+    };
+
+    renderFortifyView = () => {
+        return (
+            <div className="headerDiv">
+                <p style={{textAlign: "center"}}>FORTIFY</p>
+                <hr/>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>
+                            SOURCE
+                        </td>
+                        <td>
+                            DEST
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button>Fortify</button>
+            </div>
+        );
+    };
+
+    renderDefendView = () => {
+        return (
+            <div className="headerDiv urgentBackground">
+                <p style={{textAlign: "center"}}>DEFEND</p>
+                <hr/>
+                <h4>Your territory <ins>{"TEST"}</ins> is getting attacked!</h4>
+                <p>Defend by selecting # of dice to roll: </p>
+                <Dropdown className="dice-select" value={this.state.selectDice2}
+                          onChange={this.defenderOnDiceSelect}
+                          options={diceOptions.slice(0, this.getDefenderMaxRolls())}/>
+                <button>Defend!</button>
+            </div>
+        )
     };
 
     render() {
@@ -166,6 +215,8 @@ class Sidebar extends Component {
 
                 {this.renderAssignView()}
                 {this.renderAttackView()}
+                {this.renderFortifyView()}
+                {this.renderDefendView()}
 
                 <button onClick={this.props.handleEndTurn}>End Turn</button>
             </div>

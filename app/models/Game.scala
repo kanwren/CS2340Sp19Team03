@@ -45,6 +45,7 @@ class Game(val gameId: String) {
       }
 
     }
+
   }
 
   /** Change the current game state to running */
@@ -121,6 +122,7 @@ object Game {
     val dieSize = 6
     Seq.fill(dice)(1 + Random.nextInt(dieSize)).sorted(Ordering[Int].reverse)
   }
+
 }
 
 /** Data type representing the current state of the game

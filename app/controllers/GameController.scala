@@ -110,15 +110,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           Ok(views.html.lobby(game.getLobbiedPlayers, gameId)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Allotting =>
           Ok(views.html.game(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Assigning =>
-          Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Attacking =>
-          Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Defending(_, _, _) =>
-          Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Relocating =>
-          Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Fortifying =>
+        case Assigning | Attacking | Defending(_, _, _) | Relocating | Fortifying =>
           Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Finished(_) =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
@@ -226,6 +218,18 @@ class GameController @Inject()(cc: MessagesControllerComponents)
 
         case _ => redirectInvalidGameState(gameId)
       }
+    }
+  }
+
+  /** Signal the end of the attacking phase and the start of the fortifying phase.
+    *
+    * @param gameId the ID of the game whose state should be advanced
+    * @return a redirection to the game's page
+    */
+  def startFortifyingPhase(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.gameState = Fortifying
+      Redirect(routes.GameController.showGame(gameId))
     }
   }
 

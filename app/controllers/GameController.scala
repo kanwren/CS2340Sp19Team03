@@ -25,7 +25,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     */
   def testGame(players: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     val game = GameManager.makeNewGame
-    val playerNames: Seq[String] = ('A' to 'Z') map (_.toString) take players
+    val playerNames: Seq[String] = ('A' to 'Z').map(_.toString).take(players)
     playerNames foreach game.addPlayerToLobby
     game.startAssignment()
     game.startPlay()
@@ -141,6 +141,83 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     onGame(gameId) { game: Game =>
       game.board.territories(territoryId).armies += amount
       Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
+  /** Transfer a variable amount of armies across territories
+    *
+    * @param gameId   the game in which the transfer is occurring
+    * @param sourceId the ID of the armies' source territory
+    * @param destId   the ID of the armies' destination territory
+    * @param amount   the amount of armies to transfer
+    * @return a redirection to the game's page
+    */
+  def moveArmies(gameId: String, sourceId: Int, destId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      val source = game.board.territories(sourceId)
+      val dest = game.board.territories(destId)
+      source.armies -= amount
+      dest.armies += amount
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
+  /** Trigger the beginning of an attack
+    *
+    * @param gameId the ID of the game of which to trigger the state change
+    * @return a redirection to the game's page
+    */
+  def startAttackingPhase(gameId: String): Action[AnyContent] =
+    Action { implicit request: MessagesRequest[AnyContent] =>
+      onGame(gameId) { game: Game =>
+        game.gameState = Attacking
+        Redirect(routes.GameController.showGame(gameId))
+      }
+    }
+
+  /** Handle information about attacker decision and begin defending stage
+    *
+    * @param gameId               the ID of the game in which the attack is taking place
+    * @param attackerDice         the number of dice the attacker chose
+    * @param attackingTerritoryId the ID of the attacking territory
+    * @param defendingTerritoryId the ID of the territory being attacked
+    * @return a redirection to the game's page
+    */
+  def setAttackingDice(gameId: String, attackerDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int): Action[AnyContent] =
+    Action { implicit request: MessagesRequest[AnyContent] =>
+      onGame(gameId) { game: Game =>
+        val attackingTerritory = game.board.territories(attackingTerritoryId)
+        val defendingTerritory = game.board.territories(defendingTerritoryId)
+
+        game.activePlayer = game.playerTurn(game.board.territories(defendingTerritoryId).owner.get).get
+
+        game.gameState = Defending(attackerDice, attackingTerritory, defendingTerritory)
+
+        Redirect(routes.GameController.showGame(gameId))
+      }
+    }
+
+  /** Handle information about defender decision and advance game state as necessary. The game begins army relocation if
+    * either of the territories were conquered, or returns to the attacking phase otherwise.
+    *
+    * @param gameId       the ID of the game in which the attack is taking place
+    * @param defenderDice the number of dice the defender chose
+    * @return a redirection to the game's page
+    */
+  def setDefendingDice(gameId: String, defenderDice: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.gameState match {
+        case Defending(attackerDice, attackingTerritory, defendingTerritory) =>
+          Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
+
+          game.activePlayer = game.playerTurn(attackingTerritory.owner.get).get
+
+          game.gameState = if (defendingTerritory.armies == 0) Relocating else Attacking
+
+          Redirect(routes.GameController.showGame(gameId))
+
+        case _ => redirectInvalidGameState(gameId)
+      }
     }
   }
 

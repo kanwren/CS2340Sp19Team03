@@ -110,7 +110,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           Ok(views.html.lobby(game.getLobbiedPlayers, gameId)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Allotting =>
           Ok(views.html.game(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Assigning | Attacking | Defending(_, _, _) | Relocating | Fortifying =>
+        case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying =>
           Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Finished(_) =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
@@ -127,6 +127,18 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     onGame(gameId) { game: Game =>
       game.nextTurn()
       Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
+  def useArmy(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.gameState match {
+        case Assigning(n) if n > 0 =>
+          game.gameState = Assigning(n - 1)
+          Redirect(routes.GameController.showGame(gameId))
+        case _ =>
+          redirectInvalidGameState(gameId)
+      }
     }
   }
 

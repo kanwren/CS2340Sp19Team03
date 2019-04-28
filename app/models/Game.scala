@@ -4,6 +4,7 @@ import scala.collection.mutable
 import scala.util.Random
 
 /** Represents an instance of a game of Risk between players.
+  *
   * @param gameId the ID of this game
   */
 class Game(val gameId: String) {
@@ -12,16 +13,18 @@ class Game(val gameId: String) {
   private val lobbiedPlayers: mutable.ArrayBuffer[String] = mutable.ArrayBuffer[String]()
   var players: Seq[Player] = _
   var gameState: GameState = Lobbying
+  var activePlayer: Int = 0
 
   /** Add player to lobby during assignment.
+    *
     * @param name the display name of the player to lobby
     */
   def addPlayerToLobby(name: String): Unit = lobbiedPlayers += name
 
-  /** Change the current game state to assigning */
-  def startAssignment(): Unit = {
+  /** Change the current game state to assigning and assign armies, territories, and turn order */
+  def startAllotting(): Unit = {
     if (gameState == Lobbying) {
-      gameState = Assigning
+      gameState = Allotting
       val armies = 50 - 5 * lobbiedPlayers.length
       players = Random.shuffle(for {
         name <- lobbiedPlayers
@@ -42,23 +45,34 @@ class Game(val gameId: String) {
       }
 
     }
+
   }
 
   /** Change the current game state to running */
   def startPlay(): Unit = {
-    if (gameState == Assigning) {
-      gameState = Running
+    if (gameState == Allotting) {
+      activePlayer = turn
+      val award = players(turn).calculateReward(board)
+      players(turn).numberOfTerritories += award
+      gameState = Assigning(award)
     }
   }
 
   /** Advance the turn of the current game and award armies accordingly */
   def nextTurn(): Unit = {
-    turn += 1
-    players(turn % players.size).awardArmies(board)
+    turn = (turn + 1) % players.size
+    activePlayer = turn
+    val award = players(turn).calculateReward(board)
+    players(turn).numberOfTerritories += award
+    gameState = Assigning(award)
   }
 
   /** Fetch the lobbied players for the current game */
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers
+
+  def playerTurn(player: Player): Option[Int] = players.zipWithIndex.find(_._1 == player).map(_._2)
+
+  def playerWon(player: Player): Boolean = board.territoriesOwnedBy(player).size == Territory.totalTerritories
 
 }
 
@@ -67,21 +81,34 @@ object Game {
   val idLength: Int = 4
 
   /** Data type representing the results of a battle.
+    *
     * @param attackerRolls the dice rolls of the attacker
     * @param defenderRolls the dice rolls of the defender
-    * @param attackerLost the number of armies lost in the attacking territory
-    * @param defenderLost the number of armies lost in the defending territory
+    * @param attackerLost  the number of armies lost in the attacking territory
+    * @param defenderLost  the number of armies lost in the defending territory
     */
   case class BattleResults(attackerRolls: Seq[Int], defenderRolls: Seq[Int], attackerLost: Int, defenderLost: Int)
 
-  /** Randomly simulate and resolve battle.
-    * @param attackerDice the number of dice of the attacker
-    * @param defenderDice the number of dice of the defender
+  /** Resolve battle based on random dice rolls, and update territories accordingly.
+    *
+    * @param attackerDice       the number of dice of the attacker
+    * @param defenderDice       the number of dice of the defender
     * @param attackingTerritory the attacking territory
     * @param defendingTerritory the defending territory
-    * @return the dice rolls and armies lost of both the attacker and defender
     */
-  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): BattleResults = {
+  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): Unit = {
+    val results = simulateDiceRoll(attackerDice, defenderDice)
+    attackingTerritory.updateAfterBattle(results.attackerLost, defendingTerritory)
+    defendingTerritory.updateAfterBattle(results.defenderLost, attackingTerritory)
+  }
+
+  /** Randomly roll dice to decide the winner of a battle
+    *
+    * @param attackerDice the number of dice of the attacker
+    * @param defenderDice the number of dice of the defender
+    * @return the lists of rolls and the armies lost by both territories
+    */
+  def simulateDiceRoll(attackerDice: Int, defenderDice: Int): BattleResults = {
     val attackerRolls = rollDice(attackerDice)
     val defenderRolls = rollDice(defenderDice)
 
@@ -95,6 +122,7 @@ object Game {
   }
 
   /** Simulate randomly rolling n dice.
+    *
     * @param dice the number of dice to roll
     * @return a list of die rolls
     */
@@ -102,10 +130,14 @@ object Game {
     val dieSize = 6
     Seq.fill(dice)(1 + Random.nextInt(dieSize)).sorted(Ordering[Int].reverse)
   }
+
 }
 
 /** Data type representing the current state of the game
-  * @param turn the current position in the turn order
-  * @param players the players in the game
+  *
+  * @param turn         the current position in the turn order
+  * @param players      the players in the game
+  * @param activePlayer the player currently performing some action
   */
-case class GameInfo(turn: Int, players: Seq[Player])
+case class GameInfo(turn: Int, players: Seq[Player], activePlayer: Int)
+

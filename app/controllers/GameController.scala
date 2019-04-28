@@ -5,8 +5,10 @@ import java.net.{URLDecoder, URLEncoder}
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import javax.inject.Inject
+import models.Game.BattleResults
 import models._
 import play.api.data._
+import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc._
 
 /** Controller that monitors and manages the pool of running games.
@@ -133,5 +135,44 @@ class GameController @Inject()(cc: MessagesControllerComponents)
       Redirect(routes.GameController.showGame(gameId))
     }
   }
+
+  def setAttackingDice(attackerDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int, gameId: String): Action[AnyContent] =
+    Action { implicit request: MessagesRequest[AnyContent] =>
+      onGame(gameId) { game: Game =>
+        game.lastDiceNumber = attackerDice
+
+        game.activePlayer = game.playerTurn(game.board.territories(defendingTerritoryId).owner.get).get
+        ???
+
+      }
+    }
+
+
+  /** Resolve a battle by simulating a dice roll, and update territory armies and owners accordingly.
+    * @param attackerDice the number of dice of the attacker
+    * @param defenderDice the number of dice of the defender
+    * @param attackingTerritoryId the ID of the attacking territory
+    * @param defendingTerritoryId the ID of the defending territory
+    * @param gameId the ID of the current game
+    * @return a JSON response containing the dice rolls and armies lost by each territory
+    */
+  def simulateDiceRoll(attackerDice: Int, defenderDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int, gameId: String): Action[AnyContent] =
+    Action { implicit request: MessagesRequest[AnyContent] =>
+      onGame(gameId) { game: Game =>
+        val attackingTerritory = game.board.territories(attackingTerritoryId)
+        val defendingTerritory = game.board.territories(defendingTerritoryId)
+
+        val results: BattleResults = Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
+
+        attackingTerritory.updateAfterBattle(results.attackerLost, defendingTerritory)
+        defendingTerritory.updateAfterBattle(results.defenderLost, attackingTerritory)
+
+        val json: JsValue = Json.toJson(results)
+        Ok(json)
+
+      }
+    }
+
+  implicit val battleResultsData: Writes[BattleResults] = Json.writes[BattleResults]
 
 }

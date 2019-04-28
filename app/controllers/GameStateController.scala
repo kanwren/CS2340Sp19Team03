@@ -18,7 +18,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     */
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players))
+      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players, game.activePlayer))
       Ok(json)
     }
   }
@@ -82,33 +82,17 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     }
   }
 
-  /** Resolve a battle by simulating a dice roll, and update territory armies and owners accordingly.
-    * @param attackerDice the number of dice of the attacker
-    * @param defenderDice the number of dice of the defender
-    * @param attackingTerritoryId the ID of the attacking territory
-    * @param defendingTerritoryId the ID of the defending territory
-    * @param gameId the ID of the current game
-    * @return a JSON response containing the dice rolls and armies lost by each territory
-    */
-  def simulateDiceRoll(attackerDice: Int, defenderDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int, gameId: String): Action[AnyContent] =
-    Action { implicit request: MessagesRequest[AnyContent] =>
-      onGame(gameId) { game: Game =>
-        val attackingTerritory = game.board.territories(attackingTerritoryId)
-        val defendingTerritory = game.board.territories(defendingTerritoryId)
-
-        val results: BattleResults = Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
-
-        attackingTerritory.updateAfterBattle(results.attackerLost, defendingTerritory)
-        defendingTerritory.updateAfterBattle(results.defenderLost, attackingTerritory)
-
-        val json: JsValue = Json.toJson(results)
-        Ok(json)
-      }
+  def getActivePlayer(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      val json: JsValue = Json.toJson(game.activePlayer)
+      Ok(json)
     }
+  }
+
+
 
   implicit val playerData: Writes[Player] = Json.writes[Player]
   implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]
   implicit val territoryData: Writes[Territory] = Json.writes[Territory]
-  implicit val battleResultsData: Writes[BattleResults] = Json.writes[BattleResults]
 
 }

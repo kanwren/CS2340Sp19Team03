@@ -12,7 +12,8 @@ class Game(val gameId: String) {
   private val lobbiedPlayers: mutable.ArrayBuffer[String] = mutable.ArrayBuffer[String]()
   var players: Seq[Player] = _
   var gameState: GameState = Lobbying
-
+  var activePlayer: Int = 0
+  var lastDiceNumber: Int = 0
   /** Add player to lobby during assignment.
     * @param name the display name of the player to lobby
     */
@@ -59,6 +60,8 @@ class Game(val gameId: String) {
 
   /** Fetch the lobbied players for the current game */
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers
+
+  def playerTurn(player: Player): Option[Int] = players.zipWithIndex.find { _._1 == player }.map(_._2)
 
 }
 
@@ -108,4 +111,4 @@ object Game {
   * @param turn the current position in the turn order
   * @param players the players in the game
   */
-case class GameInfo(turn: Int, players: Seq[Player])
+case class GameInfo(turn: Int, players: Seq[Player], activePlayer: Int)

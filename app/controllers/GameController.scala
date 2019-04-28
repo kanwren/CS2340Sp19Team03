@@ -144,6 +144,24 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     }
   }
 
+  /** Transfer a variable amount of armies across territories
+    *
+    * @param gameId   the game in which the transfer is occurring
+    * @param sourceId the ID of the armies' source territory
+    * @param destId   the ID of the armies' destination territory
+    * @param amount   the amount of armies to transfer
+    * @return a redirection to the game's page
+    */
+  def moveArmies(gameId: String, sourceId: Int, destId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      val source = game.board.territories(sourceId)
+      val dest = game.board.territories(destId)
+      source.armies -= amount
+      dest.armies += amount
+      Redirect(routes.GameController.showGame(gameId))
+    }
+  }
+
   /** Trigger the beginning of an attack
     *
     * @param gameId the ID of the game of which to trigger the state change

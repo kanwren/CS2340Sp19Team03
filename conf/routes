@@ -11,10 +11,11 @@ GET     /createGame                                                         cont
 
 GET     /testGame/$players<[3-7]>                                           controllers.GameController.testGame(players: Int)
 
-# Trigger transfer to the Assignment state and redirect to showGame
+# State change endpoints
 GET     /startAllotting/$gameId<[A-Za-z0-9]{4}>                             controllers.GameController.startAllotting(gameId)
-
 GET     /startPlay/$gameId<[A-Za-z0-9]{4}>                                  controllers.GameController.startPlay(gameId)
+GET     /startAttackingPhase/$gameId<[A-Za-z0-9]{4}>                        controllers.GameController.startAttackingPhase(gameId)
+GET     /startFortifyingPhase/$gameId<[A-Za-z0-9]{4}>                       controllers.GameController.startFortifyingPhase(gameId)
 
 # Redirects to the appropriate route based on game state
 GET     /$gameId<[A-Za-z0-9]{4}>                                            controllers.GameController.showGame(gameId, playerName: Option[String] ?= None)
@@ -29,8 +30,7 @@ GET     /endTurn/$gameId<[A-Za-z0-9]{4}>                                    cont
 GET     /addArmiesToTerritory/:amount/:territoryId/$gameId<[A-Za-z0-9]{4}>  controllers.GameController.addArmiesToTerritory(gameId, territoryId: Int, amount: Int)
 GET     /moveArmies/:sourceId/:destId/:amount/$gameId<[A-Za-z0-9]{4}>       controllers.GameController.moveArmies(gameId, sourceId: Int, destId: Int, amount: Int)
 
-# Attacking functionality
-GET     /startAttackingPhase/$gameId<[A-Za-z0-9]{4}>                        controllers.GameController.startAttackingPhase(gameId)
+# Attacking phase functionality
 GET     /setAttackingDice/:attackerDice/:attackingTerritoryId/:defendingTerritoryId/$gameId<[A-Za-z0-9]{4}> controllers.GameController.setAttackingDice(gameId, attackerDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int)
 GET     /setDefendingDice/:defenderDice/$gameId<[A-Za-z0-9]{4}>             controllers.GameController.setDefendingDice(gameId, defenderDice: Int)
 

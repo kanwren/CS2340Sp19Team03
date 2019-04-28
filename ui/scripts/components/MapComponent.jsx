@@ -44,7 +44,8 @@ class MapComponent extends Component {
             adjTerrs: undefined,
             phaseIndex: 0,
             fixedPlayer: undefined,
-            tracer: new Tracer()
+            tracer: new Tracer(),
+            eventFuncs: {}
         }
     }
 
@@ -208,6 +209,7 @@ class MapComponent extends Component {
                 for (let j = 0; j < region.length; j++) {
                     region[j].node.style.strokeWidth = BORDER_WIDTH;
                     region[j].node.style.stroke = BORDER_COLOR;
+                    region[j].node.setAttribute("regionId", regionId);
                     this.setRegionColor(region[j], TERR_COLORS[playerMap[owner]]);
                 }
                 region.mouseover(() => this.setMouseOver(region, true)
@@ -222,11 +224,103 @@ class MapComponent extends Component {
                     let terr = region[j];
                     terr.node.style.strokeWidth = BORDER_WIDTH;
                     terr.node.style.stroke = BORDER_COLOR;
+                    terr.node.setAttribute("regionId", regionId);
                     this.setRegionColor(terr, TERR_COLORS[playerMap[owner]]);
 
                     terr.mouseover(() => this.setMouseOver(terr, false)
                     ).mouseout(() => this.setMouseOut(terr, false)
                     ).mousedown(() => this.setMouseDown(terr, false));
+                }
+            }
+        }
+    }
+
+    addMouseOverEventToTerritories = (f) => {
+        
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                region.mouseover(f);
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let terr = region[j];
+                    terr.mouseover(f);
+                }
+            }
+        }
+    }
+    addMouseDownEventToTerritories = (f) => {
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                region.mousedown(f);
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let terr = region[j];
+                    terr.mousedown(f);
+                }
+            }
+        }
+    }
+    addMouseUpEventToTerritories = (f) => {
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                region.mouseup(f);
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let terr = region[j];
+                    terr.mouseup(f);
+                }
+            }
+        }
+    }
+
+    removeMouseOverEventToTerritories = (name) => {
+        name = this.state.eventFuncs[name];
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                region.unmouseover(name);
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let terr = region[j];
+                    terr.unmouseover(name);
+                }
+            }
+        }
+    }
+    removeMouseDownEventToTerritories = (name) => {
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                region.unmousedown(name);
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let terr = region[j];
+                    terr.unmousedown(name);
+                }
+            }
+        }
+    }
+    removeMouseUpEventToTerritories = (name) => {
+        name = this.state.eventFuncs[name];
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                let regionId = region[0].data('id');
+                region.unmouseup(name);
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let terr = region[j];
+                    let regionId = terr.data('id');
+                    terr.unmouseup(name);
                 }
             }
         }
@@ -323,6 +417,28 @@ class MapComponent extends Component {
         return location.split("playerName=")[1];
     };
 
+    addAttackMDEvent = (f) => {
+        for (let i in window.rsrGroups) {
+            let region = window.rsrGroups[i];
+
+            if (window.linkedRegions.indexOf(region) !== -1) { //special
+                let regionId = region[0].data('id');
+                let g = (e) => {
+                    f(e, regionId, g)
+                }
+                region.mousedown(g);
+            } else {
+                for (let j = 0; j < region.length; j++) {
+                    let terr = region[j];
+                    let regionId = terr.data('id');
+                    let g = (e) => {
+                        f(e, regionId, g)
+                    }
+                    terr.mousedown(g);
+                }
+            }
+        }
+    }
     beginAttackPhase = () => {
         if (this.state.armiesLeftToAssign === 0) {
             this.setState({
@@ -330,7 +446,37 @@ class MapComponent extends Component {
                 phaseIndex: 1
             });
 
-            tracer.turnOnTracerLine();
+            this.state.tracer.turnOnTracerLine();
+            let f = (e) => {
+                console.log("Click!");
+                let regionId = e.target.getAttribute('regionId');
+                let territory = this.state.terrDatas[regionId];
+                if (this.state.currPlayer === territory.owner.name) {
+                    this.setState({ attackingRegion: territory });
+                    this.getAdjacentTerritoryIds(regionId);
+                }
+            };
+
+            let d = (e) => {
+                let regionId = e.target.getAttribute('regionId');
+                let territory = this.state.terrDatas[regionId];
+                let attacker = this.state.attackingRegion;
+                if ((attacker !== undefined) && (this.state.currPlayer !== territory.owner.name) && (this.state.adjTerrs.indexOf(parseInt(regionId)) !== -1)) {
+                    this.setState({ attackedRegion: territory });
+                    this.removeMouseDownEventToTerritories(f);
+                    this.removeMouseUpEventToTerritories(d);
+                } else {
+                    this.setState({ attackedRegion: undefined });
+                    this.setState({ attackingRegion: undefined })
+                }
+
+                console.log("Attacker: " + this.state.attackingRegion.name);
+                console.log("Defender: " + this.state.attackedRegion.name);
+
+            }
+
+            this.addMouseDownEventToTerritories(f);
+            this.addMouseUpEventToTerritories(d);
         }
     };
 

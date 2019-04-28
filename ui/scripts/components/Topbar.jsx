@@ -17,8 +17,6 @@ class Topbar extends Component {
     };
 
     getElementNameStyling = elName => {
-        console.log(elName);
-        console.log(this.props.fixedPlayer);
         if (elName === this.props.fixedPlayer) return '>>> ' + elName + ' <<<';
 
         return elName;
@@ -36,7 +34,7 @@ class Topbar extends Component {
                         return (
                             <td key={index}>
                                 <div className={this.getLabelStyling(index)}
-                                     style={{backgroundColor: this.props.terrColors[index]}}
+                                    style={{backgroundColor: this.props.terrColors[index]}}
                                 >
                                     {this.getElementNameStyling(el.name)}
                                 </div>

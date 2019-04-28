@@ -1,6 +1,6 @@
 package models
 
-import play.api.libs.json.{JsNumber, JsObject, JsString, JsValue}
+import play.api.libs.json._
 
 /** Represents the current stage of gameplay */
 sealed trait GameState {
@@ -17,9 +17,14 @@ case object Allotting extends GameState {
   override def toJson: JsValue = JsObject(Seq("state" -> JsString("ALLOTTING")))
 }
 
-/** Represents when a player assigns rewarded armies to territories */
-case object Assigning extends GameState {
-  override def toJson: JsValue = JsObject(Seq("state" -> JsString("ASSIGNING")))
+/** Represents when a player assigns rewarded armies to territories
+  *
+  * @param armiesLeft the number of armies left to assign
+  */
+case class Assigning(armiesLeft: Int) extends GameState {
+  override def toJson: JsValue = JsObject(Seq(
+    "state" -> JsString("ASSIGNING"),
+    "armiesLeft" -> JsNumber(armiesLeft)))
 }
 
 /** Represents when a player is choosing options for attacking */

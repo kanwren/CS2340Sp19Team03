@@ -51,15 +51,20 @@ class Game(val gameId: String) {
   /** Change the current game state to running */
   def startPlay(): Unit = {
     if (gameState == Allotting) {
-      gameState = Assigning
+      activePlayer = turn
+      val award = players(turn).calculateReward(board)
+      players(turn).numberOfTerritories += award
+      gameState = Assigning(award)
     }
   }
 
   /** Advance the turn of the current game and award armies accordingly */
   def nextTurn(): Unit = {
     turn = (turn + 1) % players.size
-    players(turn).awardArmies(board)
-    gameState = Assigning
+    activePlayer = turn
+    val award = players(turn).calculateReward(board)
+    players(turn).numberOfTerritories += award
+    gameState = Assigning(award)
   }
 
   /** Fetch the lobbied players for the current game */

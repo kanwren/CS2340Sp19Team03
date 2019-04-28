@@ -29,6 +29,7 @@ GET     /assets/*file                                                       cont
 GET     /endTurn/$gameId<[A-Za-z0-9]{4}>                                    controllers.GameController.endTurn(gameId)
 GET     /addArmiesToTerritory/:amount/:territoryId/$gameId<[A-Za-z0-9]{4}>  controllers.GameController.addArmiesToTerritory(gameId, territoryId: Int, amount: Int)
 GET     /moveArmies/:sourceId/:destId/:amount/$gameId<[A-Za-z0-9]{4}>       controllers.GameController.moveArmies(gameId, sourceId: Int, destId: Int, amount: Int)
+GET     /useArmy/$gameId<[A-Za-z0-9]{4}>                                    controllers.GameController.useArmy(gameId)
 
 # Attacking phase functionality
 GET     /setAttackingDice/:attackerDice/:attackingTerritoryId/:defendingTerritoryId/$gameId<[A-Za-z0-9]{4}> controllers.GameController.setAttackingDice(gameId, attackerDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int)
@@ -37,6 +38,7 @@ GET     /setDefendingDice/:defenderDice/$gameId<[A-Za-z0-9]{4}>             cont
 # Game state endpoints
 GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                                   controllers.GameStateController.getGameInfo(gameId)
 GET     /gameState/$gameId<[A-Za-z0-9]{4}>                                  controllers.GameStateController.getGameState(gameId)
+GET     /playerPhase/:playerId/$gameId<[A-Za-z0-9]{4}>                      controllers.GameStateController.getPlayerWaiting(gameId, playerId: Int)
 GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>                            controllers.GameStateController.getTerritoriesData(gameId)
 GET     /territoryInfo/:territoryId/$gameId<[A-Za-z0-9]{4}>                 controllers.GameStateController.getTerritoryData(gameId, territoryId: Int)
 GET     /territoryAdjacencies/:territoryId/$gameId<[A-Za-z0-9]{4}>          controllers.GameStateController.getTerritoryAdjacencies(gameId, territoryId: Int)

@@ -25,8 +25,8 @@
     <hr/>
 
     @if(players.length >= 3){
-       <button onclick="location.href='@routes.GameController.startAssignment(gameId)'" type="button">Start Game!</button>
+       <button onclick="location.href='@routes.GameController.startAllotting(gameId)'" type="button">Start Game!</button>
     } else {
-       <button onclick="location.href='@routes.GameController.startAssignment(gameId)'" type="button" disabled>Start Game!</button>
+       <button onclick="location.href='@routes.GameController.startAllotting(gameId)'" type="button" disabled>Start Game!</button>
     }
   }

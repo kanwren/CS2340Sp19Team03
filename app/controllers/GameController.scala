@@ -27,7 +27,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     val game = GameManager.makeNewGame
     val playerNames: Seq[String] = ('A' to 'Z').map(_.toString).take(players)
     playerNames foreach game.addPlayerToLobby
-    game.startAssignment()
+    game.startAllotting()
     game.startPlay()
     Redirect(routes.GameController.showGame(game.gameId, Some("A")))
   }
@@ -76,9 +76,9 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     * @param gameId the ID of the game to advance
     * @return a redirection to the game's page
     */
-  def startAssignment(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+  def startAllotting(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
-      game.startAssignment()
+      game.startAllotting()
       Redirect(routes.GameController.showGame(gameId))
     }
   }
@@ -108,11 +108,11 @@ class GameController @Inject()(cc: MessagesControllerComponents)
       game.gameState match {
         case Lobbying =>
           Ok(views.html.lobby(game.getLobbiedPlayers, gameId)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Assigning =>
+        case Allotting =>
           Ok(views.html.game(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Running =>
+        case Assigning | Attacking | Defending(_, _, _) | Relocating | Fortifying =>
           Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case _ =>
+        case Finished(_) =>
           Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
       }
     }
@@ -218,6 +218,18 @@ class GameController @Inject()(cc: MessagesControllerComponents)
 
         case _ => redirectInvalidGameState(gameId)
       }
+    }
+  }
+
+  /** Signal the end of the attacking phase and the start of the fortifying phase.
+    *
+    * @param gameId the ID of the game whose state should be advanced
+    * @return a redirection to the game's page
+    */
+  def startFortifyingPhase(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      game.gameState = Fortifying
+      Redirect(routes.GameController.showGame(gameId))
     }
   }
 

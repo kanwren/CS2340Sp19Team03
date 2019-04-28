@@ -13,10 +13,6 @@ let mouseDownX;
 let mouseDownY;
 
 class Tracer extends Component {
-    constructor() {
-        super();
-    }
-
     turnOnTracerLine = () => {
         document.body.addEventListener('mousedown', this.tracerMouseDown);
         document.body.addEventListener('mouseup', this.tracerMouseUp);

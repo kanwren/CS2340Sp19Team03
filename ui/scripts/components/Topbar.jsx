@@ -17,8 +17,6 @@ class Topbar extends Component {
     };
 
     getElementNameStyling = elName => {
-        console.log(elName);
-        console.log(this.props.fixedPlayer);
         if (elName === this.props.fixedPlayer) return '>>> ' + elName + ' <<<';
 
         return elName;

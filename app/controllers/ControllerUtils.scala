@@ -23,6 +23,10 @@ trait ControllerUtils {
     * @return an error redirection
     */
   def redirectInvalidGameId(gameId: String): Result =
-    Redirect(routes.GameController.index()).flashing("ERROR" -> s"Could not find game with game ID '$gameId'")
+    Redirect(routes.GameController.index()).flashing("ERROR" ->
+      s"Could not find game with game ID '$gameId'")
 
+  def redirectInvalidGameState(gameId: String): Result =
+    Redirect(routes.GameController.index()).flashing("ERROR" ->
+      s"An internal error occurred in game '$gameId': invalid game state")
 }

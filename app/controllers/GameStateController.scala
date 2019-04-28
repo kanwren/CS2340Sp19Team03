@@ -1,30 +1,32 @@
 package controllers
 
 import javax.inject.Inject
-import models.Game.BattleResults
 import models._
 import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc._
 
 /** Controller handling all requests relating to querying and modifying the
   * current game state.
+  *
   * @param cc Implicitly injected messages controller
   */
 class GameStateController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with ControllerUtils {
 
   /** Retrieves the current turn and players from a game.
+    *
     * @param gameId the ID of the game being queried
     * @return a JSON response containing the current turn and players
     */
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players, game.activePlayer))
+      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players, game.activePlayer, game.gameState.toString))
       Ok(json)
     }
   }
 
   /** Retrieves data of a territory by ID from a game.
-    * @param gameId the ID of the game being queried
+    *
+    * @param gameId      the ID of the game being queried
     * @param territoryId the ID of the territory being fetched
     * @return a JSON response containing the Territory data
     */
@@ -36,6 +38,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
   }
 
   /** Fetch the data of all territories from a game.
+    *
     * @param gameId the ID of the game being queried
     * @return a JSON response containing all Territory data in a list
     */
@@ -47,7 +50,8 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
   }
 
   /** Fetch the IDs of all territories adjacent to a given territory.
-    * @param gameId the ID of the game being queried
+    *
+    * @param gameId      the ID of the game being queried
     * @param territoryId the ID of the current territory
     * @return a JSON response containing the IDs of all territories adjacent to a territory
     */
@@ -59,7 +63,8 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
   }
 
   /** Fetch the data of a player in a game.
-    * @param gameId the ID of the game being queried
+    *
+    * @param gameId      the ID of the game being queried
     * @param playerOrder the position of the player in the turn order
     * @return a JSON response containing the corresponding Player data
     */
@@ -72,6 +77,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
 
   /**
     * Fetch the data of all players in a game.
+    *
     * @param gameId the ID of the game being queried
     * @return a JSON response containing all Player data in a list
     */
@@ -88,8 +94,6 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
       Ok(json)
     }
   }
-
-
 
   implicit val playerData: Writes[Player] = Json.writes[Player]
   implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]

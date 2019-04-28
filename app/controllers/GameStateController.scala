@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 import models._
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json._
 import play.api.mvc._
 
 /** Controller handling all requests relating to querying and modifying the
@@ -24,9 +24,31 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     }
   }
 
+  /** Retrieves the current game state from a game.
+    *
+    * @param gameId the ID of the game being queried
+    * @return a JSON response containing the data of the game state
+    */
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
       Ok(game.gameState.toJson)
+    }
+  }
+
+  /** Retrieve whether or not the player is waiting
+    *
+    * @param gameId the ID of the game being queried
+    * @param player the ID (turn order) of the player being queried
+    * @return a JSON boolean response with whether or not the player is currently waiting
+    */
+  def getPlayerWaiting(gameId: String, player: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      val waiting = game.gameState match {
+        case Lobbying | Allotting | Finished(_) => false
+        case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying if game.activePlayer == player => false
+        case _ => true
+      }
+      Ok(JsBoolean(waiting))
     }
   }
 
@@ -76,7 +98,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     */
   def getPlayerData(gameId: String, playerOrder: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.players(playerOrder))
+      val json: JsValue = game.players(playerOrder).toJson(game.board)
       Ok(json)
     }
   }
@@ -89,14 +111,14 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     */
   def getPlayersData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.players)
+      val json: JsValue = JsArray(game.players.map(_.toJson(game.board)))
       Ok(json)
     }
   }
 
   def getActivePlayer(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.activePlayer)
+      val json: JsValue = JsNumber(game.activePlayer)
       Ok(json)
     }
   }

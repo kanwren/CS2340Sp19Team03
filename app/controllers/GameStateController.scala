@@ -28,7 +28,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     *
     * @param gameId      the ID of the game being queried
     * @param territoryId the ID of the territory being fetched
-    * @return a JSON response containing the Territory data
+    * @return a JSON response containing the `Territory` data
     */
   def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
@@ -40,7 +40,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
   /** Fetch the data of all territories from a game.
     *
     * @param gameId the ID of the game being queried
-    * @return a JSON response containing all Territory data in a list
+    * @return a JSON response containing all `Territory` data in a list
     */
   def getTerritoriesData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
@@ -66,7 +66,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     *
     * @param gameId      the ID of the game being queried
     * @param playerOrder the position of the player in the turn order
-    * @return a JSON response containing the corresponding Player data
+    * @return a JSON response containing the corresponding `Player` data
     */
   def getPlayerData(gameId: String, playerOrder: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>

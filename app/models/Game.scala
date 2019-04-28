@@ -21,7 +21,7 @@ class Game(val gameId: String) {
     */
   def addPlayerToLobby(name: String): Unit = lobbiedPlayers += name
 
-  /** Change the current game state to assigning */
+  /** Change the current game state to assigning and assign armies, territories, and turn order */
   def startAssignment(): Unit = {
     if (gameState == Lobbying) {
       gameState = Assigning

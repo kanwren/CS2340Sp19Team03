@@ -1,5 +1,6 @@
 package models
 
+/** Represents the current stage of gameplay */
 sealed trait GameState
 
 case object Lobbying extends GameState

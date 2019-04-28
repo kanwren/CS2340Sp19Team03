@@ -11,9 +11,9 @@ import play.api.mvc._
 
 /** Controller that monitors and manages the pool of running games.
   *
-  * @param cc     Implicitly injected messages controller
-  * @param system Implicitly injected ActorSystem
-  * @param mat    Implicitly injected Materializer
+  * @param cc     Implicitly injected `MessagesController`
+  * @param system Implicitly injected `ActorSystem`
+  * @param mat    Implicitly injected `Materializer`
   */
 class GameController @Inject()(cc: MessagesControllerComponents)
                               (implicit system: ActorSystem, mat: Materializer) extends MessagesAbstractController(cc) with ControllerUtils {

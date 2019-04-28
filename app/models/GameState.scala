@@ -9,22 +9,22 @@ sealed trait GameState {
 
 /** Represents when players are joining the game */
 case object Lobbying extends GameState {
-  override def toJson: JsValue = JsObject(Seq("state" -> JsString("lobbying")))
+  override def toJson: JsValue = JsObject(Seq("state" -> JsString("LOBBYING")))
 }
 
 /** Represents when the player order and territories are assigned and territories are allocated */
 case object Allotting extends GameState {
-  override def toJson: JsValue = JsObject(Seq("state" -> JsString("allotting")))
+  override def toJson: JsValue = JsObject(Seq("state" -> JsString("ALLOTTING")))
 }
 
 /** Represents when a player assigns rewarded armies to territories */
 case object Assigning extends GameState {
-  override def toJson: JsValue = JsObject(Seq("state" -> JsString("assigning")))
+  override def toJson: JsValue = JsObject(Seq("state" -> JsString("ASSIGNING")))
 }
 
 /** Represents when a player is choosing options for attacking */
 case object Attacking extends GameState {
-  override def toJson: JsValue = JsObject(Seq("state" -> JsString("attacking")))
+  override def toJson: JsValue = JsObject(Seq("state" -> JsString("ATTACKING")))
 }
 
 /** Represents when a player is choosing options for defending.
@@ -35,7 +35,7 @@ case object Attacking extends GameState {
   */
 case class Defending(attackerDice: Int, attackingTerritory: Territory, defendingTerritory: Territory) extends GameState {
   override def toJson: JsValue = JsObject(Seq(
-    "state" -> JsString("defending"),
+    "state" -> JsString("DEFENDING"),
     "attackerDice" -> JsNumber(attackerDice),
     "attackingTerritoryId" -> JsNumber(attackingTerritory.id),
     "defendingTerritoryId" -> JsNumber(defendingTerritory.id)))
@@ -43,12 +43,12 @@ case class Defending(attackerDice: Int, attackingTerritory: Territory, defending
 
 /** Represents when a player is moving armies into a newly conquered territory */
 case object Relocating extends GameState {
-  override def toJson: JsValue = JsObject(Seq("state" -> JsString("relocating")))
+  override def toJson: JsValue = JsObject(Seq("state" -> JsString("RELOCATING")))
 }
 
 /** Represents when a player is moving around armies at the end of the turn */
 case object Fortifying extends GameState {
-  override def toJson: JsValue = JsObject(Seq("state" -> JsString("fortifying")))
+  override def toJson: JsValue = JsObject(Seq("state" -> JsString("FORTIFYING")))
 }
 
 /** Represents when the game has been won by a player.
@@ -57,7 +57,7 @@ case object Fortifying extends GameState {
   */
 case class Finished(winner: Player) extends GameState {
   override def toJson: JsValue = JsObject(Seq(
-    "state" -> JsString("finished"),
+    "state" -> JsString("FINISHED"),
     "winner" -> JsString(winner.name)))
 }
 

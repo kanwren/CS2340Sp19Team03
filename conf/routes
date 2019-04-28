@@ -12,7 +12,7 @@ GET     /createGame                                                         cont
 GET     /testGame/$players<[3-7]>                                           controllers.GameController.testGame(players: Int)
 
 # Trigger transfer to the Assignment state and redirect to showGame
-GET     /startAssignment/$gameId<[A-Za-z0-9]{4}>                            controllers.GameController.startAssignment(gameId)
+GET     /startAllotting/$gameId<[A-Za-z0-9]{4}>                             controllers.GameController.startAllotting(gameId)
 
 GET     /startPlay/$gameId<[A-Za-z0-9]{4}>                                  controllers.GameController.startPlay(gameId)
 
@@ -35,7 +35,8 @@ GET     /setAttackingDice/:attackerDice/:attackingTerritoryId/:defendingTerritor
 GET     /setDefendingDice/:defenderDice/$gameId<[A-Za-z0-9]{4}>             controllers.GameController.setDefendingDice(gameId, defenderDice: Int)
 
 # Game state endpoints
-GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                                   controllers.GameStateController.getGameState(gameId)
+GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                                   controllers.GameStateController.getGameInfo(gameId)
+GET     /gameState/$gameId<[A-Za-z0-9]{4}>                                  controllers.GameStateController.getGameState(gameId)
 GET     /territoriesInfo/$gameId<[A-Za-z0-9]{4}>                            controllers.GameStateController.getTerritoriesData(gameId)
 GET     /territoryInfo/:territoryId/$gameId<[A-Za-z0-9]{4}>                 controllers.GameStateController.getTerritoryData(gameId, territoryId: Int)
 GET     /territoryAdjacencies/:territoryId/$gameId<[A-Za-z0-9]{4}>          controllers.GameStateController.getTerritoryAdjacencies(gameId, territoryId: Int)

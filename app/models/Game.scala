@@ -22,9 +22,9 @@ class Game(val gameId: String) {
   def addPlayerToLobby(name: String): Unit = lobbiedPlayers += name
 
   /** Change the current game state to assigning and assign armies, territories, and turn order */
-  def startAssignment(): Unit = {
+  def startAllotting(): Unit = {
     if (gameState == Lobbying) {
-      gameState = Assigning
+      gameState = Allotting
       val armies = 50 - 5 * lobbiedPlayers.length
       players = Random.shuffle(for {
         name <- lobbiedPlayers
@@ -49,8 +49,8 @@ class Game(val gameId: String) {
 
   /** Change the current game state to running */
   def startPlay(): Unit = {
-    if (gameState == Assigning) {
-      gameState = Running
+    if (gameState == Allotting) {
+      gameState = Assigning
     }
   }
 

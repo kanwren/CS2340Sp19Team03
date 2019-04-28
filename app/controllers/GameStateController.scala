@@ -17,10 +17,16 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @param gameId the ID of the game being queried
     * @return a JSON response containing the current turn and players
     */
-  def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+  def getGameInfo(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
       val json: JsValue = Json.toJson(GameInfo(game.turn, game.players, game.activePlayer))
       Ok(json)
+    }
+  }
+
+  def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    onGame(gameId) { game: Game =>
+      Ok(game.gameState.toJson)
     }
   }
 

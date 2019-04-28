@@ -63,9 +63,7 @@ class Game(val gameId: String) {
   /** Fetch the lobbied players for the current game */
   def getLobbiedPlayers: Seq[String] = lobbiedPlayers
 
-  def playerTurn(player: Player): Option[Int] = players.zipWithIndex.find {
-    _._1 == player
-  }.map(_._2)
+  def playerTurn(player: Player): Option[Int] = players.zipWithIndex.find(_._1 == player).map(_._2)
 
 }
 

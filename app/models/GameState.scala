@@ -15,3 +15,4 @@ case object Relocating extends GameState
 case object Running extends GameState
 
 case class Finished(winner: Player) extends GameState
+

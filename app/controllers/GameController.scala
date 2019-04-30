@@ -189,6 +189,28 @@ class GameController @Inject()(cc: MessagesControllerComponents)
       overGame(gameId)(_.gameState = Attacking)
     }
 
+  /** Resolve a battle by simulating a dice roll, and update territory armies
+    * and owners accordingly. Superseded by `setAttackingDice` and
+    * `setDefendingDice`.
+    *
+    * @param attackerDice         the number of dice of the attacker
+    * @param defenderDice         the number of dice of the defender
+    * @param attackingTerritoryId the ID of the attacking territory
+    * @param defendingTerritoryId the ID of the defending territory
+    * @param gameId               the ID of the current game
+    * @return a JSON response containing the dice rolls and armies lost by each
+    *         territory
+    */
+  def simulateDiceRoll(attackerDice: Int, defenderDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int, gameId: String): Action[AnyContent] =
+    Action { implicit request: MessagesRequest[AnyContent] =>
+      gameJsonRequest(gameId) { game: Game =>
+        val attackingTerritory = game.board.territories(attackingTerritoryId)
+        val defendingTerritory = game.board.territories(defendingTerritoryId)
+
+        Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
+      }
+    }
+
   /** Handle information about attacker decision and begin defending stage
     *
     * @param gameId               the ID of the game in which the attack is taking place

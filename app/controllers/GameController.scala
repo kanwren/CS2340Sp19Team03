@@ -119,10 +119,8 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           Ok(views.html.lobby(game.getLobbiedPlayers, gameId)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Allotting =>
           Ok(views.html.game(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying =>
+        case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying | Finished(_) =>
           Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Finished(_) =>
-          Redirect(routes.GameController.index()).flashing("ERROR" -> "That part of the game hasn't been implemented yet")
       }
     }
   }

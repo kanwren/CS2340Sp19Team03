@@ -12,11 +12,8 @@
     background-color: #BBBBBB;
     height: 10%;
     border-radius: 5px;
-    margin: 0px 0 10px 0;
-}
-
-.textCenter {
-    text-align: center;
+    margin: 0 0.5% 10px 0.5%;
+    padding: 0 7px 0 7px;
 }
 
 .validTerritoryStyle {
@@ -24,5 +21,9 @@
 }
 
 .dice-select {
-    width: 50%;
+    width: 80%;
+}
+
+.urgentBackground {
+    background-color: #b22010;
 }

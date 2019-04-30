@@ -1,114 +1,129 @@
 package controllers
 
 import javax.inject.Inject
-import models.Game.BattleResults
 import models._
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json._
 import play.api.mvc._
 
 /** Controller handling all requests relating to querying and modifying the
   * current game state.
+  *
   * @param cc Implicitly injected messages controller
   */
 class GameStateController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) with ControllerUtils {
 
   /** Retrieves the current turn and players from a game.
+    *
     * @param gameId the ID of the game being queried
     * @return a JSON response containing the current turn and players
     */
+  def getGameInfo(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    gameJsonRequest(gameId) { game: Game =>
+      GameInfo(game.turn, game.players, game.activePlayer)
+    }
+  }
+
+  /** Retrieves the current game state from a game.
+    *
+    * @param gameId the ID of the game being queried
+    * @return a JSON response containing the data of the game state
+    */
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players))
-      Ok(json)
+    gameJsonRequest(gameId)(_.gameState)
+  }
+
+  /** Retrieve whether or not the player is waiting
+    *
+    * @param gameId the ID of the game being queried
+    * @param player the ID (turn order) of the player being queried
+    * @return a JSON boolean response with whether or not the player is currently waiting
+    */
+  def getPlayerWaiting(gameId: String, player: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    gameJsonRequest(gameId) { game: Game =>
+      game.gameState match {
+        case Lobbying | Allotting | Finished(_) => false
+        case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying if game.activePlayer == player => false
+        case _ => true
+      }
     }
   }
 
   /** Retrieves data of a territory by ID from a game.
-    * @param gameId the ID of the game being queried
+    *
+    * @param gameId      the ID of the game being queried
     * @param territoryId the ID of the territory being fetched
-    * @return a JSON response containing the Territory data
+    * @return a JSON response containing the `Territory` data
     */
   def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.board.territories(territoryId))
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(_.board.territories(territoryId))
   }
 
   /** Fetch the data of all territories from a game.
+    *
     * @param gameId the ID of the game being queried
-    * @return a JSON response containing all Territory data in a list
+    * @return a JSON response containing all `Territory` data in a list
     */
   def getTerritoriesData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.board.territories.values)
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(_.board.territories.values)
   }
 
   /** Fetch the IDs of all territories adjacent to a given territory.
-    * @param gameId the ID of the game being queried
+    *
+    * @param gameId      the ID of the game being queried
     * @param territoryId the ID of the current territory
     * @return a JSON response containing the IDs of all territories adjacent to a territory
     */
   def getTerritoryAdjacencies(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { _ =>
-      val json: JsValue = Json.toJson(Territory.adjacencies(territoryId))
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(_ => Territory.adjacencies(territoryId))
   }
 
   /** Fetch the data of a player in a game.
-    * @param gameId the ID of the game being queried
+    *
+    * @param gameId      the ID of the game being queried
     * @param playerOrder the position of the player in the turn order
-    * @return a JSON response containing the corresponding Player data
+    * @return a JSON response containing the corresponding `Player` data
     */
   def getPlayerData(gameId: String, playerOrder: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.players(playerOrder))
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(game => game.players(playerOrder).stateToJson(game.board))
   }
 
   /**
     * Fetch the data of all players in a game.
+    *
     * @param gameId the ID of the game being queried
     * @return a JSON response containing all Player data in a list
     */
   def getPlayersData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.players)
-      Ok(json)
+    gameJsonRequest(gameId) { game: Game =>
+      game.players.map(_.stateToJson(game.board))
     }
   }
 
-  /** Resolve a battle by simulating a dice roll, and update territory armies and owners accordingly.
-    * @param attackerDice the number of dice of the attacker
-    * @param defenderDice the number of dice of the defender
-    * @param attackingTerritoryId the ID of the attacking territory
-    * @param defendingTerritoryId the ID of the defending territory
-    * @param gameId the ID of the current game
-    * @return a JSON response containing the dice rolls and armies lost by each territory
+  /** Fetch the turn number of the player currently making an action.
+    *
+    * @param gameId the ID of the game being queried
+    * @return a JSON response containing the turn number
     */
-  def simulateDiceRoll(attackerDice: Int, defenderDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int, gameId: String): Action[AnyContent] =
-    Action { implicit request: MessagesRequest[AnyContent] =>
-      onGame(gameId) { game: Game =>
-        val attackingTerritory = game.board.territories(attackingTerritoryId)
-        val defendingTerritory = game.board.territories(defendingTerritoryId)
+  def getActivePlayer(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    gameJsonRequest(gameId)(_.activePlayer)
+  }
 
-        val results: BattleResults = Game.resolveBattle(attackerDice, defenderDice, attackingTerritory, defendingTerritory)
+  /** Fetch whether or not the defending territory was conquered after the attack phase.
+    *
+    * @param gameId the ID of the game being queried
+    * @return a JSON response containing true if the defending territory was conquered and false otherwise
+    */
+  def getDefenderConquered(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    gameJsonRequest(gameId)(_.gameState == Relocating)
+  }
 
-        attackingTerritory.updateAfterBattle(results.attackerLost, defendingTerritory)
-        defendingTerritory.updateAfterBattle(results.defenderLost, attackingTerritory)
-
-        val json: JsValue = Json.toJson(results)
-        Ok(json)
-      }
-    }
-
+  /** Converts a Player instance to a JSON object */
   implicit val playerData: Writes[Player] = Json.writes[Player]
+
+  /** Converts a GameInfo instance to a JSON object */
   implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]
+
+  /** Converts a Territory instance to a JSON object */
   implicit val territoryData: Writes[Territory] = Json.writes[Territory]
-  implicit val battleResultsData: Writes[BattleResults] = Json.writes[BattleResults]
 
 }

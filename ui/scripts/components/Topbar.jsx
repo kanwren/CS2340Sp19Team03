@@ -5,7 +5,7 @@ import './Topbar.css';
 class Topbar extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {};
     }
 
     getPlayerIndex = () => this.props.gameState.turn % this.props.gameState.players.length;
@@ -14,6 +14,12 @@ class Topbar extends Component {
         if (index === this.getPlayerIndex())
             return "label selected";
         else return "label";
+    };
+
+    getElementNameStyling = elName => {
+        if (elName === this.props.fixedPlayer) return '>>> ' + elName + ' <<<';
+
+        return elName;
     };
 
     renderNames() {
@@ -28,9 +34,9 @@ class Topbar extends Component {
                         return (
                             <td key={index}>
                                 <div className={this.getLabelStyling(index)}
-                                     style={{backgroundColor: this.props.terrColors[index]}}
+                                    style={{backgroundColor: this.props.terrColors[index]}}
                                 >
-                                    {el.name}
+                                    {this.getElementNameStyling(el.name)}
                                 </div>
                             </td>
                         );

@@ -5,29 +5,6 @@
         <h1 style="margin: 0 auto">RISK</h1>
     </div>
     <hr/>
-    <!--
-    <table>
-        <thead>
-            <tr><th>Turn Order</th><th>Player</th><th>Armies to Place</th>
-                <th>Territories Owned</th>
-        </thead>
-        <tbody>
-        @for((p, i) <- game.players.zipWithIndex) {
-            @* <tr><td>@(i + 1)</td><td>@names(i)</td><td>@playerMap(names(i))</td></tr> *@
-            <tr><td>@(i + 1)</td>
-                <td style="text-align:right;">@p.name</td><td style="text-align:right;">@p.armies</td><td style="text-align:right;">@p.numberOfTerritories</td></tr>
-        }
-        </tbody>
-    </table>
-    <div style="float: left">
-        <h3>Current Armies</h3>
-        @for(i <- 0 until game.board.territories.size) {
-            <p style="margin: 0">@i. @game.board.territories(i).name: <b>@game.board.territories(i).armies</b>
-                , <i>@game.board.territories(i).owner.get.name</i></p>
-        }
-    </div>
-    </div>
-    -->
     <div id="react-view"></div>
     <script src="@routes.Assets.versioned("compiled/bundle.js")"></script>
 }

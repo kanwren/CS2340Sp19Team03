@@ -119,8 +119,10 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           Ok(views.html.lobby(game.getLobbiedPlayers, gameId)).withCookies(Cookie("playerName", pName)).bakeCookies()
         case Allotting =>
           Ok(views.html.game(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
-        case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying | Finished(_) =>
+        case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying =>
           Ok(views.html.gameboard(game)).withCookies(Cookie("playerName", pName)).bakeCookies()
+        case Finished(winner) =>
+          Ok(views.html.finished(winner.name)).withCookies(Cookie("playerName", pName)).bakeCookies()
       }
     }
   }

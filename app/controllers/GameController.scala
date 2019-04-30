@@ -77,10 +77,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     * @return a redirection to the game's page
     */
   def startAllotting(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      game.startAllotting()
-      Redirect(routes.GameController.showGame(gameId))
-    }
+    overGame(gameId)(_.startAllotting())
   }
 
   /** Trigger the beginning of gameplay in a given game.
@@ -89,10 +86,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     * @return a redirection to the game's page
     */
   def startPlay(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      game.startPlay()
-      Redirect(routes.GameController.showGame(gameId))
-    }
+    overGame(gameId)(_.startPlay())
   }
 
   /** Display the game of a given page.
@@ -124,12 +118,14 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     * @return a redirection to the game's page
     */
   def endTurn(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      game.nextTurn()
-      Redirect(routes.GameController.showGame(gameId))
-    }
+    overGame(gameId)(_.nextTurn())
   }
 
+  /** Trigger a decrease in the current army count.
+    *
+    * @param gameId the ID of the game to change
+    * @return a redirection to the game's page, or an error page if the army use is invalid
+    */
   def useArmy(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     onGame(gameId) { game: Game =>
       game.gameState match {
@@ -150,10 +146,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     * @return a redirection to the game's page
     */
   def addArmiesToTerritory(gameId: String, territoryId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      game.board.territories(territoryId).armies += amount
-      Redirect(routes.GameController.showGame(gameId))
-    }
+    overGame(gameId)(_.board.territories(territoryId).armies += amount)
   }
 
   /** Transfer a variable amount of armies across territories
@@ -165,12 +158,11 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     * @return a redirection to the game's page
     */
   def moveArmies(gameId: String, sourceId: Int, destId: Int, amount: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
+    overGame(gameId) { game: Game =>
       val source = game.board.territories(sourceId)
       val dest = game.board.territories(destId)
       source.armies -= amount
       dest.armies += amount
-      Redirect(routes.GameController.showGame(gameId))
     }
   }
 
@@ -181,10 +173,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     */
   def startAttackingPhase(gameId: String): Action[AnyContent] =
     Action { implicit request: MessagesRequest[AnyContent] =>
-      onGame(gameId) { game: Game =>
-        game.gameState = Attacking
-        Redirect(routes.GameController.showGame(gameId))
-      }
+      overGame(gameId)(_.gameState = Attacking)
     }
 
   /** Handle information about attacker decision and begin defending stage
@@ -197,15 +186,13 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     */
   def setAttackingDice(gameId: String, attackerDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int): Action[AnyContent] =
     Action { implicit request: MessagesRequest[AnyContent] =>
-      onGame(gameId) { game: Game =>
+      overGame(gameId) { game: Game =>
         val attackingTerritory = game.board.territories(attackingTerritoryId)
         val defendingTerritory = game.board.territories(defendingTerritoryId)
 
         game.activePlayer = game.playerTurn(game.board.territories(defendingTerritoryId).owner.get).get
 
         game.gameState = Defending(attackerDice, attackingTerritory, defendingTerritory)
-
-        Redirect(routes.GameController.showGame(gameId))
       }
     }
 
@@ -248,10 +235,7 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     * @return a redirection to the game's page
     */
   def startFortifyingPhase(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      game.gameState = Fortifying
-      Redirect(routes.GameController.showGame(gameId))
-    }
+    overGame(gameId)(_.gameState = Fortifying)
   }
 
 }

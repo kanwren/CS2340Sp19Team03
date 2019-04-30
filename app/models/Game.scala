@@ -133,7 +133,7 @@ object Game {
 
 }
 
-/** Data type representing the current state of the game
+/** Data type representing information about the current state of the game
   *
   * @param turn         the current position in the turn order
   * @param players      the players in the game

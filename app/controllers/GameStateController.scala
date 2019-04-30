@@ -18,9 +18,8 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing the current turn and players
     */
   def getGameInfo(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(GameInfo(game.turn, game.players, game.activePlayer))
-      Ok(json)
+    gameJsonRequest(gameId) { game: Game =>
+      GameInfo(game.turn, game.players, game.activePlayer)
     }
   }
 
@@ -30,9 +29,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing the data of the game state
     */
   def getGameState(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      Ok(game.gameState.toJson)
-    }
+    gameJsonRequest(gameId)(_.gameState)
   }
 
   /** Retrieve whether or not the player is waiting
@@ -42,13 +39,12 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON boolean response with whether or not the player is currently waiting
     */
   def getPlayerWaiting(gameId: String, player: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val waiting = game.gameState match {
+    gameJsonRequest(gameId) { game: Game =>
+      game.gameState match {
         case Lobbying | Allotting | Finished(_) => false
         case Assigning(_) | Attacking | Defending(_, _, _) | Relocating | Fortifying if game.activePlayer == player => false
         case _ => true
       }
-      Ok(JsBoolean(waiting))
     }
   }
 
@@ -59,10 +55,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing the `Territory` data
     */
   def getTerritoryData(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.board.territories(territoryId))
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(_.board.territories(territoryId))
   }
 
   /** Fetch the data of all territories from a game.
@@ -71,10 +64,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing all `Territory` data in a list
     */
   def getTerritoriesData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = Json.toJson(game.board.territories.values)
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(_.board.territories.values)
   }
 
   /** Fetch the IDs of all territories adjacent to a given territory.
@@ -84,10 +74,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing the IDs of all territories adjacent to a territory
     */
   def getTerritoryAdjacencies(gameId: String, territoryId: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { _ =>
-      val json: JsValue = Json.toJson(Territory.adjacencies(territoryId))
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(_ => Territory.adjacencies(territoryId))
   }
 
   /** Fetch the data of a player in a game.
@@ -97,10 +84,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing the corresponding `Player` data
     */
   def getPlayerData(gameId: String, playerOrder: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = game.players(playerOrder).toJson(game.board)
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(game => game.players(playerOrder).toJson(game.board))
   }
 
   /**
@@ -110,27 +94,33 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing all Player data in a list
     */
   def getPlayersData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = JsArray(game.players.map(_.toJson(game.board)))
-      Ok(json)
+    gameJsonRequest(gameId) { game: Game =>
+      game.players.map(_.toJson(game.board))
     }
   }
 
+  /** Fetch the turn number of the player currently making an action.
+    *
+    * @param gameId the ID of the game being queried
+    * @return a JSON response containing the turn number
+    */
   def getActivePlayer(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      val json: JsValue = JsNumber(game.activePlayer)
-      Ok(json)
-    }
+    gameJsonRequest(gameId)(_.activePlayer)
   }
 
+  /** Fetch whether or not the defending territory was conquered after the attack phase.
+    *
+    * @param gameId the ID of the game being queried
+    * @return a JSON response containing true if the defending territory was conquered and false otherwise
+    */
   def getDefenderConquered(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    onGame(gameId) { game: Game =>
-      Ok(Json.toJson(game.gameState == Relocating))
-    }
+    gameJsonRequest(gameId)(_.gameState == Relocating)
   }
 
-  implicit val playerData: Writes[Player] = Json.writes[Player]
+  /** Converts a GameInfo instance to a JSON object */
   implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]
+
+  /** Converts a Territory instance to a JSON object */
   implicit val territoryData: Writes[Territory] = Json.writes[Territory]
 
 }

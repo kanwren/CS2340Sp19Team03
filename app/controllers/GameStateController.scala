@@ -84,7 +84,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     * @return a JSON response containing the corresponding `Player` data
     */
   def getPlayerData(gameId: String, playerOrder: Int): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
-    gameJsonRequest(gameId)(game => game.players(playerOrder).toJson(game.board))
+    gameJsonRequest(gameId)(game => game.players(playerOrder).stateToJson(game.board))
   }
 
   /**
@@ -95,7 +95,7 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
     */
   def getPlayersData(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     gameJsonRequest(gameId) { game: Game =>
-      game.players.map(_.toJson(game.board))
+      game.players.map(_.stateToJson(game.board))
     }
   }
 
@@ -116,6 +116,9 @@ class GameStateController @Inject()(cc: MessagesControllerComponents) extends Me
   def getDefenderConquered(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
     gameJsonRequest(gameId)(_.gameState == Relocating)
   }
+
+  /** Converts a Player instance to a JSON object */
+  implicit val playerData: Writes[Player] = Json.writes[Player]
 
   /** Converts a GameInfo instance to a JSON object */
   implicit val gameInfoData: Writes[GameInfo] = Json.writes[GameInfo]

@@ -22,7 +22,7 @@ trait ControllerUtils {
   /** Like `onGame`, except it redirects to the game's page after modifying it
     * via `handler`
     *
-    * @param gameId the ID of the game to modify
+    * @param gameId  the ID of the game to modify
     * @param handler strategy representing how the game should be modified
     * @return a redirection to the game's page
     */
@@ -35,12 +35,12 @@ trait ControllerUtils {
   /** Extracts some JSON-convertible value from a game and returns it as a
     * JSON response
     *
-    * @param gameId the ID of the game being queried
+    * @param gameId    the ID of the game being queried
     * @param extractor how the JSON-convertible value is obtained from the game
     * @tparam T the JSON-convertible type being extracted
     * @return a JSON response
     */
-  def gameJsonRequest[T : Writes](gameId: String)(extractor: Game => T): Result =
+  def gameJsonRequest[T: Writes](gameId: String)(extractor: Game => T): Result =
     onGame(gameId) { game: Game =>
       Ok(Json.toJson(extractor(game)))
     }

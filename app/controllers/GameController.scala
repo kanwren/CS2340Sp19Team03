@@ -9,6 +9,8 @@ import models._
 import play.api.data._
 import play.api.mvc._
 
+import scala.util.Random
+
 /** Controller that monitors and manages the pool of running games.
   *
   * @param cc     Implicitly injected `MessagesController`
@@ -30,6 +32,19 @@ class GameController @Inject()(cc: MessagesControllerComponents)
     game.startAllotting()
     game.startPlay()
     Redirect(routes.GameController.showGame(game.gameId, Some("A")))
+  }
+
+  /** Randomly select a winner and automatically finish a game
+    *
+    * @param gameId the ID of the game to end
+    * @return a redirection to the game's page
+    */
+  def randomWin(gameId: String): Action[AnyContent] = Action { implicit request: MessagesRequest[AnyContent] =>
+    overGame(gameId) { game: Game =>
+      val players = game.players
+      val randIndex = Random.nextInt(players.size)
+      game.gameState = Finished(players(randIndex))
+    }
   }
 
   /** Loads the home page.
@@ -216,9 +231,9 @@ class GameController @Inject()(cc: MessagesControllerComponents)
           game.gameState =
             if (game.playerWon(attacker)) {
               Finished(attacker)
-            } else if (defendingTerritory.armies == 0){
+            } else if (defendingTerritory.armies == 0) {
               Relocating
-            } else{
+            } else {
               Attacking
             }
 

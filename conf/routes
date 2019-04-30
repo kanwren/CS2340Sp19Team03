@@ -10,6 +10,7 @@ POST    /                                                                   cont
 GET     /createGame                                                         controllers.GameController.createGame
 
 GET     /testGame/$players<[3-7]>                                           controllers.GameController.testGame(players: Int)
+GET     /win/$gameId<[A-Za-z0-9]{4}>                                        controllers.GameController.randomWin(gameId: String)
 
 # State change endpoints
 GET     /startAllotting/$gameId<[A-Za-z0-9]{4}>                             controllers.GameController.startAllotting(gameId)

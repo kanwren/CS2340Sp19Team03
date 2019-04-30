@@ -1,5 +1,7 @@
 package models
 
+import play.api.libs.json.{Json, Writes}
+
 import scala.collection.mutable
 import scala.util.Random
 
@@ -80,6 +82,8 @@ class Game(val gameId: String) {
 object Game {
   val idLength: Int = 4
 
+  implicit val battleResultsWriter: Writes[BattleResults] = Json.writes[BattleResults]
+
   /** Data type representing the results of a battle.
     *
     * @param attackerRolls the dice rolls of the attacker
@@ -96,10 +100,11 @@ object Game {
     * @param attackingTerritory the attacking territory
     * @param defendingTerritory the defending territory
     */
-  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): Unit = {
+  def resolveBattle(attackerDice: Int, defenderDice: Int, attackingTerritory: Territory, defendingTerritory: Territory): BattleResults = {
     val results = simulateDiceRoll(attackerDice, defenderDice)
     attackingTerritory.updateAfterBattle(results.attackerLost, defendingTerritory)
     defendingTerritory.updateAfterBattle(results.defenderLost, attackingTerritory)
+    results
   }
 
   /** Randomly roll dice to decide the winner of a battle
@@ -133,7 +138,7 @@ object Game {
 
 }
 
-/** Data type representing the current state of the game
+/** Data type representing information about the current state of the game
   *
   * @param turn         the current position in the turn order
   * @param players      the players in the game

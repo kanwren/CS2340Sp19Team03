@@ -15,7 +15,8 @@ class Sidebar extends Component {
         this.state = {
             selectDice1: undefined,
             selectDice2: undefined,
-            rollData: undefined
+            rollData: undefined,
+            inputValue: undefined
         }
     }
 
@@ -40,6 +41,12 @@ class Sidebar extends Component {
             return this.props.selectedTerritory[property];
     }
 
+    getCurrGamePhase = () => {
+        if (this.props.currGameState === undefined) return;
+
+        return this.props.currGameState.state;
+    };
+
     getPlayerIndex = () => this.props.gameInfo.turn % this.props.gameInfo.players.length;
 
     getValidStyle = () => {
@@ -53,7 +60,6 @@ class Sidebar extends Component {
         else return region.name;
     };
 
-    /*
     handleAttack = () => {
         axios.get('/simulateDiceRolls/' + this.state.selectDice1.value + '/' +
             this.state.selectDice2.value + '/' + this.props.attackingRegion.id + '/' +
@@ -64,20 +70,21 @@ class Sidebar extends Component {
             this.props.handleUpdateArmies();
         });
     };
-    */
 
+    /*
     handleAttack = () => {
         axios.get('/setAttackingDice/' + this.state.selectDice1.value + '/' +
             this.props.attackingRegion.id + '/' + this.props.attackedRegion.id + '/' +
             this.props.gameId).then(res => {
-            /*
+
                 this.setState({
                 rollData: res.data
             });
-            */
+
             this.props.handleUpdateArmies();
         });
     };
+     */
 
     /*
 
@@ -86,11 +93,19 @@ class Sidebar extends Component {
 
      */
     handleFortify = () => {
-        axios.get('/moveArmies/' + this.props.attackingRegion.id + '/' +
-            this.props.target.id + '/' + this.props.gameId).then(res => {
-            // this.props.handleFortifyPhase(); // USELESS ??
-            this.props.handleUpdateArmies();
-        });
+        if (this.props.attackingRegion === undefined || this.props.attackedRegion === undefined) return;
+
+        let amtMove = parseInt(this.state.inputValue);
+
+        console.log("AMT: " + amtMove);
+        console.log("SRC AMT: " + this.props.attackingRegion.armies);
+
+        if ((amtMove < this.props.attackingRegion.armies) && (amtMove > 0)) {
+            axios.get('/moveArmies/' + this.props.attackingRegion.id + '/' +
+                this.props.attackedRegion.id + '/' + this.state.inputValue + '/' + this.props.gameId).then(res => {
+                this.props.handleUpdateArmies();
+            });
+        }
     };
 
     handleDefend = () => {
@@ -156,18 +171,27 @@ class Sidebar extends Component {
                     <tbody>
                     <tr>
                         <td>
-                            <h3>Attacker: {this.getRegionName(this.props.attackingRegion)}</h3>
-                            <h3>To Attack: {this.getRegionName(this.props.attackedRegion)}</h3>
+                            <i>Source</i>
                         </td>
                         <td>
-                            <Dropdown className="dice-select"
-                                      value={this.state.selectDice1}
-                                      onChange={this.attackerOnDiceSelect}
-                                      options={diceOptions.slice(0, this.getAttackerMaxRolls())}/> Dice
+                            <i>Target</i>
                         </td>
+                    </tr>
+                    <tr>
+                        <td><b>{this.getRegionName(this.props.attackingRegion)}</b></td>
+                        <td><b>{this.getRegionName(this.props.attackedRegion)}</b></td>
                     </tr>
                     </tbody>
                 </table>
+
+                <Dropdown className="dice-select"
+                          value={this.state.selectDice1}
+                          onChange={this.attackerOnDiceSelect}
+                          options={diceOptions.slice(0, this.getAttackerMaxRolls())}/>
+
+                <Dropdown className="dice-select" value={this.state.selectDice2}
+                          onChange={this.defenderOnDiceSelect}
+                          options={diceOptions.slice(0, this.getDefenderMaxRolls())}/>
 
                 {this.renderRollResults()}
                 <button onClick={this.handleAttack}>Commence Attack</button>
@@ -188,20 +212,31 @@ class Sidebar extends Component {
                     <tbody>
                     <tr>
                         <td>
-                            SOURCE
+                            <i>Source</i>
                         </td>
                         <td>
-                            DEST
+                            <i>Target</i>
                         </td>
+                    </tr>
+                    <tr>
+                        <td><b>{this.getRegionName(this.props.attackingRegion)}</b></td>
+                        <td><b>{this.getRegionName(this.props.attackedRegion)}</b></td>
                     </tr>
                     </tbody>
                 </table>
-                <input></input> Armies <br/>
+                <input value={this.state.inputValue} onChange={evt => this.updateInputValue(evt)}/>Armies<br/>
                 <button onClick={this.handleFortify}>Fortify</button>
             </div>
         );
     };
 
+    updateInputValue = evt => {
+        this.setState({
+            inputValue: evt.target.value
+        });
+    };
+
+    /*
     renderDefendView = () => {
         if (this.props.currPhase !== 'DEFENDING') return;
 
@@ -219,28 +254,53 @@ class Sidebar extends Component {
         )
     };
 
+    */
+
     render() {
         return (
             <div className="containerDiv">
                 <div className="headerDiv">
                     <p style={{textAlign: "center", margin: "0 auto"}}>GAME INFO</p>
                     <hr/>
-                    <h3>PHASE: {this.props.currPhase}</h3>
-                    <h3>TURN: {this.props.currPlayer}</h3>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td><i>Phase</i></td>
+                            <td><i>Turn</i></td>
+                        </tr>
+                        <tr>
+                            <td><b>{this.getCurrGamePhase()}</b></td>
+                            <td>{this.props.currPlayer}</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div className="headerDiv" style={{backgroundColor: this.getValidStyle()}}>
                     <p style={{textAlign: "center", margin: "0 auto"}}>SELECTED REGION</p>
-                    <h3 style={{textAlign: "center"}}>{this.getTerritoryProperty('name')}</h3>
                     <hr/>
-                    <h3>Owner: {this.getTerritoryProperty('owner')}</h3>
-                    <h3>Armies: {this.getTerritoryProperty('armies')}</h3>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td><i>Name</i></td>
+                            <td><i>Owner</i></td>
+                            <td><i>Armies</i></td>
+                        </tr>
+                        <tr>
+                            <td><b>{this.getTerritoryProperty('name')}</b></td>
+                            <td>{this.getTerritoryProperty('owner')}</td>
+                            <td>{this.getTerritoryProperty('armies')}</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 {this.renderAssignView()}
                 {this.renderAttackView()}
                 {this.renderFortifyView()}
-                {this.renderDefendView()}
+                {
+                    /*this.renderDefendView()*/
+                }
 
                 <button onClick={this.props.handleEndTurn}>End Turn</button>
             </div>

@@ -147,8 +147,51 @@ class MapComponent extends Component {
         });
     };
 
+    territoryCanAttack = id => {
+        return (this.getCurrentPhase() === 'ATTACKING') && this.state.armiesLeftToAssign === 0
+            && (this.state.currPlayer === this.state.terrDatas[id].owner.name);
+    };
+
+    territoryCanFortify = id => {
+        return (this.getCurrentPhase() === 'FORTIFYING') && this.state.armiesLeftToAssign === 0
+            && (this.state.currPlayer === this.state.terrDatas[id].owner.name) &&
+            this.state.attackingRegion === undefined;
+    };
+
+    territoryCanBeAttacked = id => {
+        if (!(this.getCurrentPhase() === 'ATTACKING') || this.state.armiesLeftToAssign > 0 ||
+            this.state.attackingRegion === undefined) return false;
+
+        return (this.state.currPlayer !== this.state.terrDatas[id].owner.name) &&
+            (this.state.adjTerrs.indexOf(id) !== -1);
+    };
+
+    territoryCanBeFortified = id => {
+        if (!(this.getCurrentPhase() === 'FORTIFYING') || this.state.armiesLeftToAssign > 0 ||
+            this.state.attackingRegion === undefined) return false;
+
+        return (this.state.currPlayer === this.state.terrDatas[id].owner.name) &&
+            (this.state.adjTerrs.indexOf(id) !== -1);
+    };
+
     setMouseDown = (region, isLinked) => {
         let id = this.getRegionId(region);
+
+        if (this.territoryCanAttack(id) || this.territoryCanFortify(id)) {
+            this.setState({
+                attackingRegion: this.state.terrDatas[id],
+                attackedRegion: undefined
+            });
+        }
+
+        if (this.state.attackingRegion !== undefined) {
+            this.getAdjacentTerritoryIds(this.state.attackingRegion.id, () => {
+                if (this.territoryCanBeAttacked(id) || this.territoryCanBeFortified(id))
+                    this.setState({
+                        attackedRegion: this.state.terrDatas[id]
+                    });
+            });
+        }
 
         if (!(this.getCurrentPhase() === 'ATTACKING') && this.state.armiesLeftToAssign > 0 &&
             (this.state.currPlayer === this.state.terrDatas[id].owner.name)) {
@@ -206,8 +249,9 @@ class MapComponent extends Component {
         }
     }
 
+    /*
     addMouseOverEventToTerritories = (f) => {
-        
+
         for (let i in window.rsrGroups) {
             let region = window.rsrGroups[i];
 
@@ -220,7 +264,8 @@ class MapComponent extends Component {
                 }
             }
         }
-    }
+    };
+
     addMouseDownEventToTerritories = (f) => {
         for (let i in window.rsrGroups) {
             let region = window.rsrGroups[i];
@@ -234,7 +279,8 @@ class MapComponent extends Component {
                 }
             }
         }
-    }
+    };
+
     addMouseUpEventToTerritories = (f) => {
         for (let i in window.rsrGroups) {
             let region = window.rsrGroups[i];
@@ -248,7 +294,7 @@ class MapComponent extends Component {
                 }
             }
         }
-    }
+    };
 
     removeMouseOverEventToTerritories = (name) => {
         name = this.state.eventFuncs[name];
@@ -264,7 +310,8 @@ class MapComponent extends Component {
                 }
             }
         }
-    }
+    };
+
     removeMouseDownEventToTerritories = (name) => {
         for (let i in window.rsrGroups) {
             let region = window.rsrGroups[i];
@@ -278,7 +325,8 @@ class MapComponent extends Component {
                 }
             }
         }
-    }
+    };
+
     removeMouseUpEventToTerritories = (name) => {
         name = this.state.eventFuncs[name];
         for (let i in window.rsrGroups) {
@@ -295,7 +343,8 @@ class MapComponent extends Component {
                 }
             }
         }
-    }
+    };
+     */
 
     setRegionColor = (region, color) => {
         region.attr('fill', color);
@@ -416,53 +465,68 @@ class MapComponent extends Component {
 
         return this.state.currGameState.state;
     };
+
+    /*
+    f = e => {
+        // console.log("Click!");
+        let regionId = e.target.getAttribute('regionId');
+        let territory = this.state.terrDatas[regionId];
+        if (this.state.currPlayer === territory.owner.name) {
+            this.setState({attackingRegion: territory});
+            this.getAdjacentTerritoryIds(regionId);
+        }
+    };
+
+    d = e => {
+        let regionId = e.target.getAttribute('regionId');
+        let territory = this.state.terrDatas[regionId];
+        let attacker = this.state.attackingRegion;
+
+        if ((attacker !== undefined) && (this.state.currPlayer !== territory.owner.name) &&
+            (this.state.adjTerrs.indexOf(parseInt(regionId)) !== -1)) {
+            this.setState({attackedRegion: territory});
+            this.removeMouseDownEventToTerritories(e => this.f(e));
+            this.removeMouseUpEventToTerritories(e => this.d(e));
+        } else {
+            this.setState({attackedRegion: undefined});
+            this.setState({attackingRegion: undefined})
+        }
+
+        // console.log("Attacker: " + this.state.attackingRegion.name);
+        // console.log("Defender: " + this.state.attackedRegion.name);
+    };
+     */
+
     beginAttackPhase = () => {
         if (this.state.armiesLeftToAssign === 0) {
             axios.get("/startAttackingPhase/" + this.getGameIdFromPath()).then(() => {
                 this.updateCurrGameState();
             });
 
+            /*
             this.state.tracer.turnOnTracerLine();
-            let f = (e) => {
-                console.log("Click!");
-                let regionId = e.target.getAttribute('regionId');
-                let territory = this.state.terrDatas[regionId];
-                if (this.state.currPlayer === territory.owner.name) {
-                    this.setState({ attackingRegion: territory });
-                    this.getAdjacentTerritoryIds(regionId);
-                }
-            };
-
-            let d = (e) => {
-                let regionId = e.target.getAttribute('regionId');
-                let territory = this.state.terrDatas[regionId];
-                let attacker = this.state.attackingRegion;
-                if ((attacker !== undefined) && (this.state.currPlayer !== territory.owner.name) && (this.state.adjTerrs.indexOf(parseInt(regionId)) !== -1)) {
-                    this.setState({ attackedRegion: territory });
-                    this.removeMouseDownEventToTerritories(f);
-                    this.removeMouseUpEventToTerritories(d);
-                } else {
-                    this.setState({ attackedRegion: undefined });
-                    this.setState({ attackingRegion: undefined })
-                }
-
-                console.log("Attacker: " + this.state.attackingRegion.name);
-                console.log("Defender: " + this.state.attackedRegion.name);
-
-            }
-
-            this.addMouseDownEventToTerritories(f);
-            this.addMouseUpEventToTerritories(d);
+            this.addMouseDownEventToTerritories(this.f);
+            this.addMouseUpEventToTerritories(this.d);
+             */
         }
     };
 
     beginFortifyPhase = () => {
-        // SET BACKEND PHASE TO FORTIFY
-        console.log("this");
+        if (this.state.armiesLeftToAssign === 0) {
+            axios.get("/startFortifyingPhase/" + this.getGameIdFromPath()).then(() => {
+                this.updateCurrGameState();
+                this.setState({
+                    attackingRegion: undefined,
+                    attackedRegion: undefined
+                })
+            });
 
-        axios.get("/startFortifyingPhase/" + this.getGameIdFromPath(), () => {
-            this.updateCurrGameState();
-        });
+            /*
+            this.state.tracer.turnOnTracerLine();
+            this.addMouseDownEventToTerritories(this.f);
+            this.addMouseUpEventToTerritories(this.d);
+             */
+        }
     };
 
     /*

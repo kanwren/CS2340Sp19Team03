@@ -10,6 +10,7 @@ POST    /                                                                   cont
 GET     /createGame                                                         controllers.GameController.createGame
 
 GET     /testGame/$players<[3-7]>                                           controllers.GameController.testGame(players: Int)
+GET     /win/$gameId<[A-Za-z0-9]{4}>                                        controllers.GameController.randomWin(gameId: String)
 
 # State change endpoints
 GET     /startAllotting/$gameId<[A-Za-z0-9]{4}>                             controllers.GameController.startAllotting(gameId)
@@ -34,6 +35,7 @@ GET     /useArmy/$gameId<[A-Za-z0-9]{4}>                                    cont
 # Attacking phase functionality
 GET     /setAttackingDice/:attackerDice/:attackingTerritoryId/:defendingTerritoryId/$gameId<[A-Za-z0-9]{4}> controllers.GameController.setAttackingDice(gameId, attackerDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int)
 GET     /setDefendingDice/:defenderDice/$gameId<[A-Za-z0-9]{4}>             controllers.GameController.setDefendingDice(gameId, defenderDice: Int)
+GET     /simulateDiceRolls/:attackerDice/:defenderDice/:attackingTerritoryId/:defendingTerritoryId/$gameId<[A-Za-z0-9]{4}> controllers.GameController.simulateDiceRoll(attackerDice: Int, defenderDice: Int, attackingTerritoryId: Int, defendingTerritoryId: Int, gameId: String)
 
 # Game state endpoints
 GET     /gameInfo/$gameId<[A-Za-z0-9]{4}>                                   controllers.GameStateController.getGameInfo(gameId)

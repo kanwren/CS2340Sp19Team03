@@ -36,7 +36,13 @@ case class Player(name: String,
 
   override def toString: String = name
 
-  def toJson(board: Board): JsValue = JsObject(Seq(
+  /** Convert information about a player to a JSON object based on the current
+    * state of the board
+    *
+    * @param board the board of the game that the player is in
+    * @return a JSON value representing the player's state
+    */
+  def stateToJson(board: Board): JsValue = JsObject(Seq(
     "name" -> JsString(name),
     "armies" -> JsNumber(armies),
     "gameId" -> JsString(gameId),

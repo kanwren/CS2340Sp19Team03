@@ -66,3 +66,9 @@ case class Finished(winner: Player) extends GameState {
     "winner" -> JsString(winner.name)))
 }
 
+/** Utilities related to the game state */
+object GameState {
+  /** Converts a GameState into a JSON value using its `toJson` method */
+  implicit val gameStateWriter: Writes[GameState] = _.toJson
+}
+
